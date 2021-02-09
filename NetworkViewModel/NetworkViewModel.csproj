@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NetworkLogic\NetworkModel.csproj" />
+    <ProjectReference Include="..\NetworkModel\NetworkModel.csproj" />
   </ItemGroup>
 
 </Project>

@@ -13,7 +13,7 @@ namespace Server
         {
             Logic ServerLogic = new Logic();
             Console.WriteLine("server starting ...");
-            ServerLogic.Start();
+            ServerLogic.Start(); // TODO: async wait for start
             Console.WriteLine("listing on port xxx ...");
             WaitForData(ServerLogic);
             WaitForCommands(ServerLogic);
@@ -28,7 +28,7 @@ namespace Server
             ServerLogic.WaitForClient();
             Console.WriteLine("client connected, waiting for data ...");
 
-            while (message != "stop")
+            while (message != "stop" && ServerLogic.IsConnected)
             {
                 worker = Task.Run(() => ServerLogic.WaitForData());
                 message = await worker;

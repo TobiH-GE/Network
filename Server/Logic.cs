@@ -40,12 +40,19 @@ namespace ServerLogic
             byte[] data = new byte[1024];
             string message = "";
 
-            while ((receivedBytes = stream.Read(data, 0, data.Length)) == 0)
+            try
             {
-                Task.Delay(100);
-            }
+                while ((receivedBytes = stream.Read(data, 0, data.Length)) == 0)
+                {
+                    Task.Delay(100);
+                }
 
-            message = Encoding.ASCII.GetString(data, 0, receivedBytes);
+                message = Encoding.ASCII.GetString(data, 0, receivedBytes);
+            }
+            catch
+            {
+                //TODO: error
+            }
             
             return message;
         }

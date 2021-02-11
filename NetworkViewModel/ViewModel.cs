@@ -17,12 +17,15 @@ namespace NetworkViewModel
         int _port = 1337;
         string _message = "";
         bool _isConnected = false;
+        string _chatBox = "";
 
         public ViewModel()
         {
             Connect = new Connect() { Parent = this };
             Send = new Send() { Parent = this };
             Disconnect = new Disconnect() { Parent = this };
+
+            TCPConnection.OnReceive = Receive;
         }
 
         public string Address
@@ -72,6 +75,22 @@ namespace NetworkViewModel
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsConnected)));
                 }
             }
+        }
+        public string ChatBox
+        {
+            get { return _chatBox; }
+            set
+            {
+                if (_chatBox != value)
+                {
+                    _chatBox = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ChatBox)));
+                }
+            }
+        }
+        void Receive(string message)
+        {
+            ChatBox += message;
         }
     }
 }

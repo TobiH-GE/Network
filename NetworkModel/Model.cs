@@ -8,10 +8,26 @@ namespace NetworkModel
     {
         static TcpClient connection = new TcpClient();
         static NetworkStream dataStream;
+        public static Action<string> OnReceive;
         public static void Connect(string address, int port)
         {
             connection.Connect(address, port);
             dataStream = connection.GetStream();
+
+            ReceiveData_Async();
+        }
+        public static async void ReceiveData_Async()
+        {
+            string message = "";
+
+            byte[] data = new byte[1024];
+            int receivedBytes;
+
+            receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length));
+
+            message = Encoding.ASCII.GetString(data, 0, receivedBytes);
+
+            OnReceive.Invoke(message);
         }
         public static void Send(string message)
         {

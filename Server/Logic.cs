@@ -64,6 +64,7 @@ namespace ServerLogic
             byte[] data;
             data = Encoding.ASCII.GetBytes(message);
             connection.GetStream().Write(data, 0, data.Length);
+            Console.WriteLine("sending: " + message);
         }
         string ReceiveData()
         {

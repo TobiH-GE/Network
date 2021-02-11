@@ -37,7 +37,7 @@ namespace Server
                     if (ServerLogic.IsConnected) Console.WriteLine("status connected ...");
                     else Console.WriteLine("status disconnected ...");
                 }
-                if (command == "/send")
+                if (command[..5] == "/send")
                 {
                     ServerLogic.Send(command[6..]);
                 }

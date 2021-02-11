@@ -11,6 +11,7 @@ namespace ServerLogic
     class Client
     {
         public TcpClient connection;
+        public Task task;
         public string message;
         public int receivedBytes = 0;
         public byte[] data = new byte[1024];
@@ -34,8 +35,7 @@ namespace ServerLogic
     {
         TcpListener listener;
         LinkedList<Client> connectedClients = new LinkedList<Client>(); //TODO: list with clients
-
-        public async void Start_Async()
+        public void Start()
         {
             if (listener == null)
             {
@@ -47,10 +47,12 @@ namespace ServerLogic
 
             while (true) // TODO: unfinished code!
             {
+                TcpClient connection = listener.AcceptTcpClient();
                 Console.WriteLine("client connected, waiting for data ...");
-                Client newClient = new Client(await Task.Run(() => listener.AcceptTcpClient()));
+                Client newClient = new Client(connection);
+                newClient.task = new Task(() => ReceiveData_Async(newClient));
                 connectedClients.AddLast(newClient);
-                _ = Task.Run(() => ReceiveData_Async(newClient)); 
+                newClient.task.Start();
             }
         }
         async void ReceiveData_Async(Client client)
@@ -76,6 +78,7 @@ namespace ServerLogic
                 }
             }
             Console.WriteLine("stopping ...");
+            connectedClients.Remove(client);
         }
         public void Send(string message)
         {

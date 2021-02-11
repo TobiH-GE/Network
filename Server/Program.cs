@@ -18,8 +18,7 @@ namespace Server
         }
         static async void Start(Logic ServerLogic)
         {
-            await Task.Run(() => ServerLogic.Start_Async());
-            Console.WriteLine("listing on port xxx ...");
+            await Task.Run(() => ServerLogic.Start());
         }
         static void WaitForCommands(Logic ServerLogic)
         {

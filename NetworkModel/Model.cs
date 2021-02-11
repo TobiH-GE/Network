@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace NetworkModel
 {
@@ -8,12 +9,15 @@ namespace NetworkModel
     {
         static TcpClient connection;
         static NetworkStream dataStream;
+        static CancellationTokenSource cts;
+
         public static Action<string> OnReceive;
         public static void Connect(string address, int port)
         {
             connection = new TcpClient();
             connection.Connect(address, port);
             dataStream = connection.GetStream();
+            cts = new CancellationTokenSource();
 
             ReceiveData_Async();
         }
@@ -22,20 +26,25 @@ namespace NetworkModel
             string message = "";
 
             byte[] data = new byte[1024];
-            int receivedBytes;
-            try
+            int receivedBytes = 0;
+            while (connection.Connected)
             {
-                while (connection.Connected)
+                try
                 {
-                    receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length));
+                    receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length), cts.Token);
                     message = Encoding.ASCII.GetString(data, 0, receivedBytes);
                     OnReceive.Invoke(message);
                 }
-            }
-            catch (Exception)
-            {
-                OnReceive.Invoke("(connection error or connection aborted)");
-                Disconnect();
+                catch (Exception)
+                {
+                    OnReceive.Invoke("(connection error or connection aborted)");
+                    Disconnect();
+                }
+                if (receivedBytes < 1 || message[..12] == "server: stop") // TODO: optimize, remove bug
+                {
+                    Console.WriteLine("connection error, closing connection: ...");
+                    connection.Close();
+                }
             }
         }
         public static void Send(string message)

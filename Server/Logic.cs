@@ -33,11 +33,10 @@ namespace ServerLogic
     class Logic
     {
         TcpListener listener;
-        TcpClient connection;
+        LinkedList<Client> connectedClients = new LinkedList<Client>(); //TODO: list with clients
 
         public async void Start_Async()
         {
-            Task worker;
             if (listener == null)
             {
                 listener = new TcpListener(IPAddress.Any, 1337);
@@ -46,12 +45,12 @@ namespace ServerLogic
 
             Console.WriteLine("waiting for clients ...");
 
-            while (true)
+            while (true) // TODO: unfinished code!
             {
-                connection = await Task.Run(() => listener.AcceptTcpClient());
                 Console.WriteLine("client connected, waiting for data ...");
-                Client newClient = new Client(connection);
-                Task.Run(() => ReceiveData_Async(newClient)); // TODO: unfinished code!
+                Client newClient = new Client(await Task.Run(() => listener.AcceptTcpClient()));
+                connectedClients.AddLast(newClient);
+                _ = Task.Run(() => ReceiveData_Async(newClient)); 
             }
         }
         async void ReceiveData_Async(Client client)
@@ -63,6 +62,7 @@ namespace ServerLogic
                     client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
                     client.message = Encoding.ASCII.GetString(client.data, 0, client.receivedBytes);
                     Console.WriteLine("received: " + client.message);
+                    Send(client.message);
                 }
                 catch
                 {
@@ -73,25 +73,28 @@ namespace ServerLogic
                 {
                     Console.WriteLine("connection error, closing connection: ...");
                     client.connection.Close();
-
                 }
             }
             Console.WriteLine("stopping ...");
-            //Start_Async();
         }
         public void Send(string message)
         {
-            if (connection == null || !connection.Connected) return;
-            byte[] data;
-            data = Encoding.ASCII.GetBytes("server: " + message);
-            connection.GetStream().Write(data, 0, data.Length);
-            Console.WriteLine("sending: " + message);
+            foreach (var client in connectedClients)
+            {
+                if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
+                byte[] data;
+                data = Encoding.ASCII.GetBytes("server: " + message);
+                client.connection.GetStream().Write(data, 0, data.Length);
+                Console.WriteLine("sending: " + message);
+            }
         }
         public void Stop()
         {
-            connection.Close();
+            foreach (var client in connectedClients)
+            {
+                client.connection.Close(); //TODO: client.connection
+            }
             listener.Stop();
         }
     }
-    
 }

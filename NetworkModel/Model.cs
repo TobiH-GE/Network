@@ -40,7 +40,7 @@ namespace NetworkModel
                     OnReceive.Invoke("(connection error or connection aborted)");
                     Disconnect();
                 }
-                if (receivedBytes < 1 || message[..12] == "server: stop") // TODO: optimize, remove bug
+                if (receivedBytes < 1) // TODO: optimize, remove bug
                 {
                     Console.WriteLine("connection error, closing connection: ...");
                     connection.Close();

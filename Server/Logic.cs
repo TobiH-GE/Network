@@ -32,17 +32,16 @@ namespace ServerLogic
             listener = new TcpListener(IPAddress.Any, 1337);
             listener.Start();
 
-            connection = listener.AcceptTcpClient();
+            Console.WriteLine("waiting for client ...");
 
-            while (connection.Connected == false)
+            while (connection == null || connection.Connected == false)
             {
+                connection = listener.AcceptTcpClient();
                 worker = Task.Run(() => Task.Delay(1000));
                 await worker;
             }
             Console.WriteLine("client connected, waiting for data ...");
-
             stream = connection.GetStream();
-
             ReceiveData_Async();
         }
         async void ReceiveData_Async()

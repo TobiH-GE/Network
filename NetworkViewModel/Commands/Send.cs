@@ -19,7 +19,7 @@ namespace NetworkViewModel
 
         public void Execute(object parameter)
         {
-            TCPConnection.Send(Parent.Message + "\n");
+            TCPConnection.Send(Parent.Message);
         }
     }
 }

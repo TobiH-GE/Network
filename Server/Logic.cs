@@ -28,9 +28,11 @@ namespace ServerLogic
         public async void Start_Async()
         {
             Task worker;
-
-            listener = new TcpListener(IPAddress.Any, 1337);
-            listener.Start();
+            if (listener == null)
+            {
+                listener = new TcpListener(IPAddress.Any, 1337);
+                listener.Start();
+            }
 
             Console.WriteLine("waiting for client ...");
 
@@ -41,21 +43,35 @@ namespace ServerLogic
                 await worker;
             }
             Console.WriteLine("client connected, waiting for data ...");
-            stream = connection.GetStream();
             ReceiveData_Async();
         }
         async void ReceiveData_Async()
         {
             string message = "";
-            Task<string> worker;
+            int receivedBytes = 0;
+            byte[] data = new byte[1024];
 
-            while (message != "stop" && IsConnected)
+            while (IsConnected)
             {
-                worker = Task.Run(() => ReceiveData());
-                message = await worker;
-                Console.WriteLine("data received: " + message);
+                try
+                {
+                    receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length));
+                    message = Encoding.ASCII.GetString(data, 0, receivedBytes);
+                    Console.WriteLine("received: " + message);
+                }
+                catch
+                {
+                    Console.WriteLine("error: ...");
+                    //TODO: error
+                }
+                if (receivedBytes < 1 || message[..4] == "stop")
+                {
+                    Console.WriteLine("connection error, closing connection: ...");
+                    connection.Close();
+                }
             }
             Console.WriteLine("stopping ...");
+            Start_Async();
         }
         public void Send(string message)
         {
@@ -64,28 +80,6 @@ namespace ServerLogic
             data = Encoding.ASCII.GetBytes("server: " + message);
             connection.GetStream().Write(data, 0, data.Length);
             Console.WriteLine("sending: " + message);
-        }
-        string ReceiveData()
-        {
-            int receivedBytes;
-            byte[] data = new byte[1024];
-            string message = "";
-
-            try
-            {
-                while ((receivedBytes = stream.Read(data, 0, data.Length)) == 0)
-                {
-                    Task.Delay(100);
-                }
-
-                message = Encoding.ASCII.GetString(data, 0, receivedBytes);
-            }
-            catch
-            {
-                //TODO: error
-            }
-            
-            return message;
         }
         public void Stop()
         {

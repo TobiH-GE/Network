@@ -19,7 +19,8 @@ namespace NetworkViewModel
 
         public void Execute(object parameter)
         {
-            TCPConnection.Send(Parent.Message);
+            TCPConnection.Send(Parent.Message + "\n");
+            Parent.ChatBox += "you: " + Parent.Message + "\n";
         }
     }
 }

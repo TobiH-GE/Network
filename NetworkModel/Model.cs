@@ -22,12 +22,12 @@ namespace NetworkModel
 
             byte[] data = new byte[1024];
             int receivedBytes;
-
-            receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length));
-
-            message = Encoding.ASCII.GetString(data, 0, receivedBytes);
-
-            OnReceive.Invoke(message);
+            while (connection.Connected)
+            {
+                receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length));
+                message = Encoding.ASCII.GetString(data, 0, receivedBytes);
+                OnReceive.Invoke(message);
+            }
         }
         public static void Send(string message)
         {

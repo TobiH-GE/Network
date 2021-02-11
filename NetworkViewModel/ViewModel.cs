@@ -90,7 +90,7 @@ namespace NetworkViewModel
         }
         void Receive(string message)
         {
-            ChatBox += message;
+            ChatBox += message + "\n";
         }
     }
 }

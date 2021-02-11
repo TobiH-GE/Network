@@ -62,7 +62,7 @@ namespace ServerLogic
         {
             if (connection == null || !connection.Connected) return;
             byte[] data;
-            data = Encoding.ASCII.GetBytes(message);
+            data = Encoding.ASCII.GetBytes("server: " + message);
             connection.GetStream().Write(data, 0, data.Length);
             Console.WriteLine("sending: " + message);
         }

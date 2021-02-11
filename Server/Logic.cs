@@ -10,19 +10,19 @@ namespace ServerLogic
 {
     class Client
     {
-        public TcpClient _connection;
+        public TcpClient connection;
         public string message;
         public int receivedBytes = 0;
         public byte[] data = new byte[1024];
         public Client(TcpClient connection)
         {
-            _connection = connection;
+            this.connection = connection;
         }
         public bool IsConnected
         {
             get
             {
-                if (_connection != null && _connection.Connected)
+                if (connection != null && connection.Connected)
                     return true;
                 else
                     return false;
@@ -60,7 +60,7 @@ namespace ServerLogic
             {
                 try
                 {
-                    client.receivedBytes = await connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
+                    client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
                     client.message = Encoding.ASCII.GetString(client.data, 0, client.receivedBytes);
                     Console.WriteLine("received: " + client.message);
                 }
@@ -72,7 +72,8 @@ namespace ServerLogic
                 if (client.receivedBytes < 1 || client.message[..4] == "stop")
                 {
                     Console.WriteLine("connection error, closing connection: ...");
-                    connection.Close();
+                    client.connection.Close();
+
                 }
             }
             Console.WriteLine("stopping ...");

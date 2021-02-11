@@ -13,9 +13,13 @@ namespace Server
         {
             Logic ServerLogic = new Logic();
             Console.WriteLine("server starting ...");
-            ServerLogic.Start_Async(); // TODO: async wait for start
-            Console.WriteLine("listing on port xxx ...");
+            Start(ServerLogic);
             WaitForCommands(ServerLogic);
+        }
+        static async void Start(Logic ServerLogic)
+        {
+            await Task.Run(() => ServerLogic.Start_Async()); // TODO: async wait for start
+            Console.WriteLine("listing on port xxx ...");
         }
         static void WaitForCommands(Logic ServerLogic)
         {
@@ -32,6 +36,10 @@ namespace Server
                 {
                     if (ServerLogic.IsConnected) Console.WriteLine("status connected ...");
                     else Console.WriteLine("status disconnected ...");
+                }
+                if (command == "/send")
+                {
+                    ServerLogic.Send(command[6..]);
                 }
             }
             Console.WriteLine("closing application ...");

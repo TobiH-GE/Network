@@ -16,18 +16,28 @@ namespace ServerLogic
 
         public bool IsConnected
         {
-            get { return connection.Connected; }
+            get
+            {
+                if (connection != null && connection.Connected)
+                    return true;
+                else
+                    return false;
+            }
         }
 
         public async void Start_Async()
         {
+            Task worker;
+
             listener = new TcpListener(IPAddress.Any, 1337);
             listener.Start();
 
             connection = listener.AcceptTcpClient();
+
             while (connection.Connected == false)
             {
-                await Task.Delay(100);
+                worker = Task.Run(() => Task.Delay(1000));
+                await worker;
             }
             Console.WriteLine("client connected, waiting for data ...");
 
@@ -47,6 +57,13 @@ namespace ServerLogic
                 Console.WriteLine("data received: " + message);
             }
             Console.WriteLine("stopping ...");
+        }
+        public void Send(string message)
+        {
+            if (connection == null || !connection.Connected) return;
+            byte[] data;
+            data = Encoding.ASCII.GetBytes(message);
+            connection.GetStream().Write(data, 0, data.Length);
         }
         string ReceiveData()
         {

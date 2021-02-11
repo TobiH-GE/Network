@@ -19,22 +19,36 @@ namespace ServerLogic
             get { return connection.Connected; }
         }
 
-        public void Start()
+        public async void Start_Async()
         {
             listener = new TcpListener(IPAddress.Any, 1337);
             listener.Start();
-        }
-        public bool WaitForClient()
-        {
+
             connection = listener.AcceptTcpClient();
             while (connection.Connected == false)
             {
-                Task.Delay(100);
+                await Task.Delay(100);
             }
+            Console.WriteLine("client connected, waiting for data ...");
+
             stream = connection.GetStream();
-            return true;
+
+            ReceiveData_Async();
         }
-        public string WaitForData()
+        async void ReceiveData_Async()
+        {
+            string message = "";
+            Task<string> worker;
+
+            while (message != "stop" && IsConnected)
+            {
+                worker = Task.Run(() => ReceiveData());
+                message = await worker;
+                Console.WriteLine("data received: " + message);
+            }
+            Console.WriteLine("stopping ...");
+        }
+        string ReceiveData()
         {
             int receivedBytes;
             byte[] data = new byte[1024];

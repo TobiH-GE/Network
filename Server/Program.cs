@@ -13,28 +13,9 @@ namespace Server
         {
             Logic ServerLogic = new Logic();
             Console.WriteLine("server starting ...");
-            ServerLogic.Start(); // TODO: async wait for start
+            ServerLogic.Start_Async(); // TODO: async wait for start
             Console.WriteLine("listing on port xxx ...");
-            WaitForData(ServerLogic);
             WaitForCommands(ServerLogic);
-            Console.WriteLine("server closed connection!");
-        }
-
-        static async void WaitForData(Logic ServerLogic)
-        {
-            string message = "";
-            Task<string> worker;
-
-            ServerLogic.WaitForClient();
-            Console.WriteLine("client connected, waiting for data ...");
-
-            while (message != "stop" && ServerLogic.IsConnected)
-            {
-                worker = Task.Run(() => ServerLogic.WaitForData());
-                message = await worker;
-                Console.WriteLine("data received: " + message);
-            }
-            Console.WriteLine("stopping ...");
         }
         static void WaitForCommands(Logic ServerLogic)
         {
@@ -42,7 +23,11 @@ namespace Server
             while (command != "/exit")
             {
                 command = Console.ReadLine();
-                if (command == "/stop") ServerLogic.Stop();
+                if (command == "/stop")
+                {
+                    ServerLogic.Stop();
+                    Console.WriteLine("server closed connection!");
+                }
                 if (command == "/status")
                 {
                     if (ServerLogic.IsConnected) Console.WriteLine("status connected ...");

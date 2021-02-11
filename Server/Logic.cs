@@ -8,11 +8,22 @@ using System.Threading.Tasks;
 
 namespace ServerLogic
 {
+    class Client
+    {
+        public TcpClient _connection;
+        public string message;
+        public int receivedBytes = 0;
+        public byte[] data = new byte[1024];
+        public Client(TcpClient connection)
+        {
+            _connection = connection;
+        }
+    }
+
     class Logic
     {
         TcpListener listener;
         TcpClient connection;
-        NetworkStream stream;
 
         public bool IsConnected
         {
@@ -34,37 +45,34 @@ namespace ServerLogic
                 listener.Start();
             }
 
-            Console.WriteLine("waiting for client ...");
+            Console.WriteLine("waiting for clients ...");
 
-            while (connection == null || connection.Connected == false)
+            while (true)
             {
                 connection = listener.AcceptTcpClient();
                 worker = Task.Run(() => Task.Delay(1000));
                 await worker;
+                Console.WriteLine("client connected, waiting for data ...");
+                Client newClient = new Client(connection);
+                Task.Run(() => ReceiveData_Async(newClient)); // TODO: unfinished code!
             }
-            Console.WriteLine("client connected, waiting for data ...");
-            ReceiveData_Async();
         }
-        async void ReceiveData_Async()
+        async void ReceiveData_Async(Client client)
         {
-            string message = "";
-            int receivedBytes = 0;
-            byte[] data = new byte[1024];
-
             while (IsConnected)
             {
                 try
                 {
-                    receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length));
-                    message = Encoding.ASCII.GetString(data, 0, receivedBytes);
-                    Console.WriteLine("received: " + message);
+                    client.receivedBytes = await connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
+                    client.message = Encoding.ASCII.GetString(client.data, 0, client.receivedBytes);
+                    Console.WriteLine("received: " + client.message);
                 }
                 catch
                 {
                     Console.WriteLine("error: ...");
                     //TODO: error
                 }
-                if (receivedBytes < 1 || message[..4] == "stop")
+                if (client.receivedBytes < 1 || client.message[..4] == "stop")
                 {
                     Console.WriteLine("connection error, closing connection: ...");
                     connection.Close();
@@ -83,7 +91,6 @@ namespace ServerLogic
         }
         public void Stop()
         {
-            stream.Close();
             connection.Close();
             listener.Stop();
         }

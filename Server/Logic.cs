@@ -18,23 +18,22 @@ namespace ServerLogic
         {
             _connection = connection;
         }
+        public bool IsConnected
+        {
+            get
+            {
+                if (_connection != null && _connection.Connected)
+                    return true;
+                else
+                    return false;
+            }
+        }
     }
 
     class Logic
     {
         TcpListener listener;
         TcpClient connection;
-
-        public bool IsConnected
-        {
-            get
-            {
-                if (connection != null && connection.Connected)
-                    return true;
-                else
-                    return false;
-            }
-        }
 
         public async void Start_Async()
         {
@@ -49,9 +48,7 @@ namespace ServerLogic
 
             while (true)
             {
-                connection = listener.AcceptTcpClient();
-                worker = Task.Run(() => Task.Delay(1000));
-                await worker;
+                connection = await Task.Run(() => listener.AcceptTcpClient());
                 Console.WriteLine("client connected, waiting for data ...");
                 Client newClient = new Client(connection);
                 Task.Run(() => ReceiveData_Async(newClient)); // TODO: unfinished code!
@@ -59,7 +56,7 @@ namespace ServerLogic
         }
         async void ReceiveData_Async(Client client)
         {
-            while (IsConnected)
+            while (client.IsConnected)
             {
                 try
                 {
@@ -79,7 +76,7 @@ namespace ServerLogic
                 }
             }
             Console.WriteLine("stopping ...");
-            Start_Async();
+            //Start_Async();
         }
         public void Send(string message)
         {

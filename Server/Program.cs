@@ -34,8 +34,10 @@ namespace Server
                 }
                 if (command == "/status")
                 {
-                    if (ServerLogic.IsConnected) Console.WriteLine("status connected ...");
-                    else Console.WriteLine("status disconnected ...");
+                    //if (ServerLogic.IsConnected) Console.WriteLine("status connected ...");
+                    //else Console.WriteLine("status disconnected ...");
+
+                    Console.WriteLine("not implented!");
                 }
                 if (command[..5] == "/send")
                 {

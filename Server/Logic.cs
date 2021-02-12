@@ -5,13 +5,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using NetworkMessage;
 
 namespace ServerLogic
 {
     class Logic
     {
         TcpListener listener;
-        LinkedList<Client> connectedClients = new LinkedList<Client>(); //TODO: list with clients
+        LinkedList<Client> connectedClients = new LinkedList<Client>();
         Action<string> consoleResponse;
 
         public Logic(Action<string> consoleResponse)
@@ -28,7 +29,7 @@ namespace ServerLogic
 
             consoleResponse.Invoke("waiting for clients ...");
 
-            while (true) // TODO: unfinished code!
+            while (true)
             {
                 TcpClient connection = listener.AcceptTcpClient();
                 consoleResponse.Invoke("client connected, waiting for data ...");
@@ -45,9 +46,22 @@ namespace ServerLogic
                 try
                 {
                     client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
-                    client.message = Encoding.ASCII.GetString(client.data, 0, client.receivedBytes);
-                    consoleResponse.Invoke("received: " + client.message);
-                    Send(client.message);
+                    MessageType MessageType = (MessageType)client.data[0];
+                    DataType DataType = (DataType)client.data[1];
+                    if (DataType == DataType.Text)
+                    {
+                        string message = Encoding.ASCII.GetString(client.data[2..], 0, client.receivedBytes-2);
+                        string[] array = message.Split(",");
+                        string parameter = array[0];
+                        string username = array[1];
+                        string text = array[2];
+                        consoleResponse.Invoke($"received: {(byte)MessageType}, {(byte)DataType} {message}");
+                        Send($"{username}: {text}");
+                    }
+                    else if (DataType == DataType.File) //TODO: file handling
+                    {
+                        byte[] file = client.data[2..];
+                    }
                 }
                 catch
                 {
@@ -69,14 +83,14 @@ namespace ServerLogic
             {
                 if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
                 byte[] data;
-                data = Encoding.ASCII.GetBytes("server: " + message);
+                data = Encoding.ASCII.GetBytes(message);
                 client.connection.GetStream().Write(data, 0, data.Length);
             }
             consoleResponse.Invoke("sending: " + message);
         }
         public void Status()
         {
-            string returnString = "";
+            string returnString = "connected clients:\n";
             foreach (var client in connectedClients)
             {
                 returnString+=$"client: xx, connected: { client.connection.Connected }, IP: { client.connection.Client.RemoteEndPoint}";

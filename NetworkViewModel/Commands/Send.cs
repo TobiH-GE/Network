@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Input;
 using NetworkModel;
+using NetworkMessage;
 
 namespace NetworkViewModel
 {
@@ -19,7 +20,7 @@ namespace NetworkViewModel
 
         public void Execute(object parameter)
         {
-            TCPConnection.Send(Parent.Message);
+            TCPConnection.Send((MessageType)4, (DataType)0 , Parent.Group.ToString(), Parent.Name, Parent.Message);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using NetworkMessage;
 
 namespace NetworkModel
 {
@@ -47,9 +48,12 @@ namespace NetworkModel
                 }
             }
         }
-        public static void Send(string message)
+        public static void Send(MessageType messagetype, DataType datatype, string parameter, string username, string message)
         {
-            byte[] data = Encoding.ASCII.GetBytes(message);
+            string datastring = $" {parameter},{username},{message}";
+            byte[] data = Encoding.ASCII.GetBytes(datastring);
+            data[0] = (byte)messagetype;
+            data[1] = (byte)datatype;
             dataStream.Write(data, 0, data.Length);
         }
         public static void Disconnect()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,10 +8,18 @@ using ServerLogic;
 
 namespace Server
 {
+    enum commands
+    {
+        start,
+        stop,
+        status,
+        exit
+    }
     class Program
     {
         static void Main(string[] args)
         {
+
             Logic ServerLogic = new Logic(ConsolePrint);
             Console.WriteLine("server starting ...");
             Start(ServerLogic);
@@ -23,20 +32,20 @@ namespace Server
         static void WaitForCommands(Logic ServerLogic)
         {
             string command = "";
-            while (command != "/exit")
+            while (command != commands.exit.ToString())
             {
-                command = Console.ReadLine();
-                if (command == "/stop")
+                command = Console.ReadLine()[1..];
+                if (command == "stop")
                 {
                     ServerLogic.Stop();
                 }
-                if (command == "/status")
+                if (command == "status")
                 {
                     ServerLogic.Status();
                 }
-                if (command.Length > 4 && command[..5] == "/send")
+                if (command == "send")
                 {
-                    ServerLogic.Send(command[6..]);
+                    ServerLogic.Send(command[5..]);
                 }
             }
             Console.WriteLine("closing application ...");

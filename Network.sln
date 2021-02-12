@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkModel", "NetworkModel\NetworkModel.csproj", "{5016F58D-A4B7-4148-8C0F-E75B3514EEF8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMessage", "NetworkMessage\NetworkMessage.csproj", "{B878A5BA-7F8A-4461-BD5F-B42E13C63B6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{5016F58D-A4B7-4148-8C0F-E75B3514EEF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5016F58D-A4B7-4148-8C0F-E75B3514EEF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5016F58D-A4B7-4148-8C0F-E75B3514EEF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B878A5BA-7F8A-4461-BD5F-B42E13C63B6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B878A5BA-7F8A-4461-BD5F-B42E13C63B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B878A5BA-7F8A-4461-BD5F-B42E13C63B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B878A5BA-7F8A-4461-BD5F-B42E13C63B6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

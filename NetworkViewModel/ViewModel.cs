@@ -16,6 +16,7 @@ namespace NetworkViewModel
         Random rnd = new Random();
 
         string _name = "";
+        int _group = 1;
         string _password = "password";
         string _address = "127.0.0.1";
         int _port = 1337;
@@ -42,6 +43,18 @@ namespace NetworkViewModel
                 {
                     _name = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                }
+            }
+        }
+        public int Group
+        {
+            get { return _group; }
+            set
+            {
+                if (_group != value)
+                {
+                    _group = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Group)));
                 }
             }
         }

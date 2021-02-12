@@ -17,6 +17,10 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="1" Grid.Column="0">
+            <Label Content="Name"/>
+            <TextBox x:Name="tbName" Text="{Binding Name}"/>
+            <Label Content="Password"/>
+            <TextBox x:Name="tbPassword" Text="{Binding Password}"/>
             <Label Content="IP-Address"/>
             <TextBox x:Name="tbIPAddress" Text="{Binding Address}"/>
             <Label Content="Port"/>

@@ -13,6 +13,10 @@ namespace NetworkViewModel
         public ICommand Send { get; init; }
         public ICommand Disconnect { get; init; }
 
+        Random rnd = new Random();
+
+        string _name = "";
+        string _password = "password";
         string _address = "127.0.0.1";
         int _port = 1337;
         string _message = "";
@@ -26,8 +30,33 @@ namespace NetworkViewModel
             Disconnect = new Disconnect() { Parent = this };
 
             TCPConnection.OnReceive = Receive;
-        }
 
+            Name = rnd.Next(10000, 99999).ToString();
+        }
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                }
+            }
+        }
+        public string Password
+        {
+            get { return _password; }
+            set
+            {
+                if (_password != value)
+                {
+                    _password = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Password)));
+                }
+            }
+        }
         public string Address
         {
             get { return _address; }

@@ -11,7 +11,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            Logic ServerLogic = new Logic();
+            Logic ServerLogic = new Logic(ConsolePrint);
             Console.WriteLine("server starting ...");
             Start(ServerLogic);
             WaitForCommands(ServerLogic);
@@ -29,18 +29,21 @@ namespace Server
                 if (command == "/stop")
                 {
                     ServerLogic.Stop();
-                    Console.WriteLine("server closed connection!");
                 }
                 if (command == "/status")
                 {
                     ServerLogic.Status();
                 }
-                if (command[..5] == "/send")
+                if (command.Length > 4 && command[..5] == "/send")
                 {
                     ServerLogic.Send(command[6..]);
                 }
             }
             Console.WriteLine("closing application ...");
+        }
+        static void ConsolePrint(string msg)
+        {
+            Console.WriteLine(msg);
         }
     }
 }

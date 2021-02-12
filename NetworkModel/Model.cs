@@ -50,10 +50,12 @@ namespace NetworkModel
         }
         public static void Send(MessageType messagetype, DataType datatype, string parameter, string username, string message)
         {
-            string datastring = $" {parameter},{username},{message}";
+            string datastring = $"    {parameter}{username}{message}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
             data[0] = (byte)messagetype;
             data[1] = (byte)datatype;
+            data[2] = (byte)parameter.Length;
+            data[3] = (byte)username.Length;
             dataStream.Write(data, 0, data.Length);
         }
         public static void Disconnect()

@@ -48,14 +48,19 @@ namespace ServerLogic
                     client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
                     MessageType MessageType = (MessageType)client.data[0];
                     DataType DataType = (DataType)client.data[1];
-                    if (DataType == DataType.Text)
+                    byte ParamterLenght = client.data[2];
+                    byte UsernameLenght = client.data[3];
+                    if (DataType == DataType.Text) //TODO: correct offsets
                     {
-                        string message = Encoding.ASCII.GetString(client.data[2..], 0, client.receivedBytes-2);
-                        string[] array = message.Split(",");
-                        string parameter = array[0];
-                        string username = array[1];
-                        string text = array[2];
-                        consoleResponse.Invoke($"received: {(byte)MessageType}, {(byte)DataType} {message}");
+                        consoleResponse.Invoke($"received: {Encoding.ASCII.GetString(client.data)}");
+                        int offset = 3;
+                        string message = Encoding.ASCII.GetString(client.data, offset, client.receivedBytes - offset);
+                        consoleResponse.Invoke($"message: {message}");
+                        string parameter = message.Substring(offset, ParamterLenght);
+                        consoleResponse.Invoke($"parameter: {parameter}");
+                        string username = message.Substring(offset + ParamterLenght, UsernameLenght);
+                        consoleResponse.Invoke($"username: {username}");
+                        string text = message.Substring(offset + ParamterLenght + UsernameLenght);
                         Send($"{username}: {text}");
                     }
                     else if (DataType == DataType.File) //TODO: file handling

@@ -16,7 +16,7 @@ namespace NetworkViewModel
         Random rnd = new Random();
 
         string _username = "";
-        int _group = 1;
+        int _group = 1; // room id
         string _password = "password";
         string _address = "127.0.0.1";
         int _port = 1337;

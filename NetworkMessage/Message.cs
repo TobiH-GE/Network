@@ -23,20 +23,47 @@ namespace NetworkMessage
     {
         public MessageType MessageType;
         public DataType DataType;
-        public string MessageParameter;
-        public string Data;
+        public string Parameter;
+        public string Username;
+        public string Text;
+        public byte[] Data;
 
-        public Message(MessageType MessageType, DataType DataType, string MessageParameter, string Data)
+        /*public Message(MessageType MessageType, DataType DataType, string MessageParameter, string Data)
         {
             this.MessageType = MessageType;
             this.DataType = DataType;
             this.MessageParameter = MessageParameter;
             this.Data = Data;
-        }
-        public byte[] getBytes() //TODO: correct
+        }*/
+        public Message(byte[] data)
         {
-            string temp = $"{(char)MessageType}{(char)DataType}{MessageParameter}" + Data;
-            return Encoding.ASCII.GetBytes(temp);
+            MessageType MessageType = (MessageType)data[0];
+            DataType DataType = (DataType)data[1];
+            byte ParamterLenght = data[2];
+            byte UsernameLenght = data[3];
+
+            if (DataType == DataType.Text)
+            {
+                int offset = 4;
+                string message = Encoding.ASCII.GetString(data, offset, data.Length - offset);
+                Parameter = message.Substring(0, ParamterLenght);
+                Username = message.Substring(ParamterLenght, UsernameLenght);
+                Text = message.Substring(ParamterLenght + UsernameLenght);
+            }
+            else if (DataType == DataType.File) //TODO: file handling
+            {
+                int offset = 4;
+                string message = Encoding.ASCII.GetString(data, offset, ParamterLenght + UsernameLenght);
+                Parameter = message.Substring(0, ParamterLenght);
+                Username = message.Substring(ParamterLenght, UsernameLenght);
+                int fileoffset = offset + ParamterLenght + UsernameLenght;
+                Data = data[fileoffset..];
+            }
         }
+        //public byte[] getBytes() //TODO: correct
+        //{
+        //    string temp = $"{(char)MessageType}{(char)DataType}{MessageParameter}" + Data;
+        //    return Encoding.ASCII.GetBytes(temp);
+        //}
     }
 }

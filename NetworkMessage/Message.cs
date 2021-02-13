@@ -28,13 +28,13 @@ namespace NetworkMessage
         public string Text;
         public byte[] Data;
 
-        /*public Message(MessageType MessageType, DataType DataType, string MessageParameter, string Data)
+        public Message(MessageType MessageType, DataType DataType, string MessageParameter, string Text)
         {
             this.MessageType = MessageType;
             this.DataType = DataType;
-            this.MessageParameter = MessageParameter;
-            this.Data = Data;
-        }*/
+            this.Parameter = MessageParameter;
+            this.Text = Text;
+        }
         public Message(byte[] data)
         {
             MessageType MessageType = (MessageType)data[0];
@@ -60,10 +60,15 @@ namespace NetworkMessage
                 Data = data[fileoffset..];
             }
         }
-        //public byte[] getBytes() //TODO: correct
-        //{
-        //    string temp = $"{(char)MessageType}{(char)DataType}{MessageParameter}" + Data;
-        //    return Encoding.ASCII.GetBytes(temp);
-        //}
+        public byte[] getBytes() //TODO: create more message types
+        {
+            string datastring = $"    {Parameter}{Username}{Text}";
+            byte[] data = Encoding.ASCII.GetBytes(datastring);
+            data[0] = (byte)MessageType.Group;
+            data[1] = (byte)DataType.Text;
+            data[2] = (byte)Parameter.Length;
+            data[3] = (byte)Username.Length;
+            return data;
+        }
     }
 }

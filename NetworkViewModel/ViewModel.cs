@@ -15,7 +15,7 @@ namespace NetworkViewModel
 
         Random rnd = new Random();
 
-        string _name = "";
+        string _username = "";
         int _group = 1;
         string _password = "password";
         string _address = "127.0.0.1";
@@ -32,17 +32,17 @@ namespace NetworkViewModel
 
             TCPConnection.OnReceive = Receive;
 
-            Name = rnd.Next(10000, 99999).ToString();
+            Username = rnd.Next(10000, 99999).ToString(); // random name
         }
-        public string Name
+        public string Username
         {
-            get { return _name; }
+            get { return _username; }
             set
             {
-                if (_name != value)
+                if (_username != value)
                 {
-                    _name = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                    _username = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Username)));
                 }
             }
         }

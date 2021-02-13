@@ -34,7 +34,7 @@ namespace NetworkModel
                 {
                     receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length), cts.Token);
                     message = new Message(data);
-                    OnReceive.Invoke(message.Text);
+                    OnReceive.Invoke(message.Username + ": " + message.Text);
                 }
                 catch (Exception)
                 {

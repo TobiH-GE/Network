@@ -58,7 +58,7 @@ namespace ServerLogic
                         string parameter = message.Substring(0, ParamterLenght);
                         string username = message.Substring(ParamterLenght, UsernameLenght);
                         string text = message.Substring(ParamterLenght + UsernameLenght);
-                        Send($"{username}: {text}");
+                        Send($"{username}: {text}"); //TODO: send message in correct format
                     }
                     else if (DataType == DataType.File) //TODO: file handling
                     {
@@ -68,7 +68,7 @@ namespace ServerLogic
                         string username = message.Substring(ParamterLenght, UsernameLenght);
                         int fileoffset = offset + ParamterLenght + UsernameLenght;
                         byte[] file = client.data[fileoffset..];
-                        Send($"{username}: (is sending a file)");
+                        Send($"{username}: (is sending a file)"); //TODO: send message in correct format
                     }
                 }
                 catch

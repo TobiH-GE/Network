@@ -28,11 +28,12 @@ namespace NetworkMessage
         public string Text;
         public byte[] Data;
 
-        public Message(MessageType MessageType, DataType DataType, string MessageParameter, string Text)
+        public Message(MessageType MessageType, DataType DataType, string MessageParameter, string Username, string Text)
         {
             this.MessageType = MessageType;
             this.DataType = DataType;
             this.Parameter = MessageParameter;
+            this.Username = Username;
             this.Text = Text;
         }
         public Message(byte[] data)

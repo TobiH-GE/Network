@@ -47,29 +47,9 @@ namespace ServerLogic
                 {
                     client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
                     MessageType MessageType = (MessageType)client.data[0];
-                    DataType DataType = (DataType)client.data[1];
-                    byte ParamterLenght = client.data[2];
-                    byte UsernameLenght = client.data[3];
-
-                    if (DataType == DataType.Text)
-                    {
-                        int offset = 4;
-                        string message = Encoding.ASCII.GetString(client.data, offset, client.receivedBytes - offset);
-                        string parameter = message.Substring(0, ParamterLenght);
-                        string username = message.Substring(ParamterLenght, UsernameLenght);
-                        string text = message.Substring(ParamterLenght + UsernameLenght);
-                        Send($"{username}: {text}"); //TODO: send message in correct format
-                    }
-                    else if (DataType == DataType.File) //TODO: file handling
-                    {
-                        int offset = 4;
-                        string message = Encoding.ASCII.GetString(client.data, offset, ParamterLenght + UsernameLenght);
-                        string parameter = message.Substring(0, ParamterLenght);
-                        string username = message.Substring(ParamterLenght, UsernameLenght);
-                        int fileoffset = offset + ParamterLenght + UsernameLenght;
-                        byte[] file = client.data[fileoffset..];
-                        Send($"{username}: (is sending a file)"); //TODO: send message in correct format
-                    }
+                    Message incomingMessage = new Message(client.data);
+                    consoleResponse.Invoke("incomingMessage ...");
+                    Send(incomingMessage);
                 }
                 catch
                 {
@@ -95,6 +75,17 @@ namespace ServerLogic
                 client.connection.GetStream().Write(data, 0, data.Length);
             }
             consoleResponse.Invoke("sending: " + message);
+        }
+        public void Send(Message message)
+        {
+            foreach (var client in connectedClients)
+            {
+                if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
+                byte[] data;
+                data = message.getBytes();
+                client.connection.GetStream().Write(data, 0, data.Length);
+            }
+            consoleResponse.Invoke("sending message ... ");
         }
         public void Status()
         {

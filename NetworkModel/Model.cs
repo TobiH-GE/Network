@@ -24,7 +24,7 @@ namespace NetworkModel
         }
         public static async void ReceiveData_Async()
         {
-            string message = "";
+            Message message;
 
             byte[] data = new byte[1024];
             int receivedBytes = 0;
@@ -33,8 +33,8 @@ namespace NetworkModel
                 try
                 {
                     receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length), cts.Token);
-                    message = Encoding.ASCII.GetString(data, 0, receivedBytes);
-                    OnReceive.Invoke(message);
+                    message = new Message(data);
+                    OnReceive.Invoke(message.Text);
                 }
                 catch (Exception)
                 {

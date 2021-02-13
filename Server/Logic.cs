@@ -50,6 +50,7 @@ namespace ServerLogic
                     DataType DataType = (DataType)client.data[1];
                     byte ParamterLenght = client.data[2];
                     byte UsernameLenght = client.data[3];
+
                     if (DataType == DataType.Text)
                     {
                         int offset = 4;
@@ -61,7 +62,13 @@ namespace ServerLogic
                     }
                     else if (DataType == DataType.File) //TODO: file handling
                     {
-                        byte[] file = client.data[2..];
+                        int offset = 4;
+                        string message = Encoding.ASCII.GetString(client.data, offset, ParamterLenght + UsernameLenght);
+                        string parameter = message.Substring(0, ParamterLenght);
+                        string username = message.Substring(ParamterLenght, UsernameLenght);
+                        int fileoffset = offset + ParamterLenght + UsernameLenght;
+                        byte[] file = client.data[fileoffset..];
+                        Send($"{username}: (is sending a file)");
                     }
                 }
                 catch

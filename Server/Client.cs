@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Server
@@ -9,6 +10,7 @@ namespace Server
         public Task task;
         public int receivedBytes = 0;
         public byte[] data = new byte[1024];
+        public LinkedList<int> rooms = new LinkedList<int>();
         public Client(TcpClient connection)
         {
             this.connection = connection;
@@ -23,5 +25,9 @@ namespace Server
                     return false;
             }
         }
+    }
+    public class Room
+    {
+        int id;
     }
 }

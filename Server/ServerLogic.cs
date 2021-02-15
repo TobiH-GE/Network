@@ -46,17 +46,26 @@ namespace Server
                 {
                     client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
                     MsgType MessageType = (MsgType)client.data[0];
+                    SubType SubType = (SubType)client.data[1];
                     if (MessageType == MsgType.Command)
                     {
-                        MessageCommand incomingMessage = new MessageCommand(client.data);
                         consoleResponse.Invoke("incoming command ...");
-                        // do something;
+                        MessageCommand incomingMessage = new MessageCommand(client.data);
+                        if (SubType == SubType.Login)
+                        {
+                            if (incomingMessage.Parameter == "password")
+                                consoleResponse.Invoke("password correct ...");
+                            else
+                                consoleResponse.Invoke("password wrong ...");
+
+                            // do something;
+                        }
                     }
                     else if (MessageType == MsgType.Data)
                     {
                         MessageData incomingMessage = new MessageData(client.data);
                         consoleResponse.Invoke("incoming data message ...");
-                        // Send(incomingMessage);
+                        Send(incomingMessage);
                     }
                     else if (MessageType == MsgType.Text)
                     {
@@ -94,7 +103,7 @@ namespace Server
             }
             consoleResponse.Invoke("sending: " + message);
         }
-        public void Send(MessageText message)
+        public void Send(Message message)
         {
             foreach (var client in connectedClients)
             {

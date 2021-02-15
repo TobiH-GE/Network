@@ -82,7 +82,7 @@ namespace NetworkMessage
             Parameter = message.Substring(0, ParamterLenght);
             Username = message.Substring(ParamterLenght, UsernameLenght);
             int fileoffset = offset + ParamterLenght + UsernameLenght;
-            Data = Data[fileoffset..];
+            this.Data = Data[fileoffset..];
         }
         public override byte[] getBytes() //TODO: correct {Data}
         {

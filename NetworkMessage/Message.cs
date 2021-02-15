@@ -11,6 +11,7 @@ namespace NetworkMessage
     public enum SubType : byte //TODO: more subtypes
     {
         Login,
+        LoginRequest,
         Logout,
         Direct,
         Group
@@ -35,14 +36,14 @@ namespace NetworkMessage
     public class MessageCommand : Message
     {
         public string Command;
-        public MessageCommand(MsgType MessageType, SubType Stype, string MessageParameter, string Username, string Command) : base(MessageType, Stype, MessageParameter, Username)
+        public MessageCommand(MsgType MessageType, SubType Stype, string MessageParameter = "", string Username = "", string Command = "") : base(MessageType, Stype, MessageParameter, Username)
         {
             this.Command = Command;
         }
         public MessageCommand(byte[] Data)
         {
-            MsgType MessageType = (MsgType)Data[0];
-            SubType DataType = (SubType)Data[1];
+            Mtype = (MsgType)Data[0];
+            Stype = (SubType)Data[1];
             byte ParamterLenght = Data[2];
             byte UsernameLenght = Data[3];
 
@@ -72,8 +73,8 @@ namespace NetworkMessage
         }
         public MessageData(byte[] Data)
         {
-            MsgType MessageType = (MsgType)Data[0];
-            SubType DataType = (SubType)Data[1];
+            Mtype = (MsgType)Data[0];
+            Stype = (SubType)Data[1];
             byte ParamterLenght = Data[2];
             byte UsernameLenght = Data[3];
 
@@ -104,8 +105,8 @@ namespace NetworkMessage
         }
         public MessageText(byte[] Data)
         {
-            MsgType MessageType = (MsgType)Data[0];
-            SubType DataType = (SubType)Data[1];
+            Mtype = (MsgType)Data[0];
+            Stype = (SubType)Data[1];
             byte ParamterLenght = Data[2];
             byte UsernameLenght = Data[3];
 

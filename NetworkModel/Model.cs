@@ -37,7 +37,11 @@ namespace NetworkModel
                     if (MessageType == MsgType.Command)
                     {
                         MessageCommand incomingMessage = new MessageCommand(data);
-                        // do something
+                        if (SubType == SubType.LoginRequest)
+                        {
+                            OnReceive.Invoke("server is requesting login data ...");
+                            // do something
+                        }
                     }
                     else if (MessageType == MsgType.Data)
                     {

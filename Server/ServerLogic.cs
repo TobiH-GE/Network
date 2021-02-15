@@ -31,11 +31,13 @@ namespace Server
             while (true)
             {
                 TcpClient connection = listener.AcceptTcpClient();
-                consoleResponse.Invoke("client connected, waiting for data ...");
+                consoleResponse.Invoke("client connected ...");
                 Client newClient = new Client(connection);
                 newClient.task = new Task(() => ReceiveData_Async(newClient));
                 connectedClients.AddLast(newClient);
                 newClient.task.Start();
+                consoleResponse.Invoke("sending login request to client ...");
+                Send(newClient, new MessageCommand(MsgType.Command, SubType.LoginRequest));
             }
         }
         async void ReceiveData_Async(Client client)
@@ -65,13 +67,13 @@ namespace Server
                     {
                         MessageData incomingMessage = new MessageData(client.data);
                         consoleResponse.Invoke("incoming data message ...");
-                        Send(incomingMessage);
+                        SendAll(incomingMessage);
                     }
                     else if (MessageType == MsgType.Text)
                     {
                         MessageText incomingMessage = new MessageText(client.data);
                         consoleResponse.Invoke("incoming text message ...");
-                        Send(incomingMessage);
+                        SendAll(incomingMessage);
                     }
                     else
                     {
@@ -92,7 +94,7 @@ namespace Server
             consoleResponse.Invoke("stopping ...");
             connectedClients.Remove(client);
         }
-        public void Send(string message)
+        public void SendAll(string message)
         {
             foreach (var client in connectedClients)
             {
@@ -101,9 +103,9 @@ namespace Server
                 data = Encoding.ASCII.GetBytes(message);
                 client.connection.GetStream().Write(data, 0, data.Length);
             }
-            consoleResponse.Invoke("sending: " + message);
+            consoleResponse.Invoke("sending text to all: " + message);
         }
-        public void Send(Message message)
+        public void SendAll(Message message)
         {
             foreach (var client in connectedClients)
             {
@@ -112,7 +114,17 @@ namespace Server
                 data = message.getBytes();
                 client.connection.GetStream().Write(data, 0, data.Length);
             }
-            consoleResponse.Invoke("sending text message ... ");
+            consoleResponse.Invoke("sending message to all ... ");
+        }
+        public void Send(Client client, Message message)
+        {
+            if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
+            {
+                byte[] data;
+                data = message.getBytes();
+                client.connection.GetStream().Write(data, 0, data.Length);
+                consoleResponse.Invoke("sending message to client ... ");
+            }
         }
         public void Status()
         {

@@ -40,7 +40,7 @@ namespace Server
                 }
                 if (command == "send")
                 {
-                    ServerLogic.Send(command[5..]);
+                    ServerLogic.SendAll(command[5..]);
                 }
             }
             Console.WriteLine("closing application ...");

@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Text;
 
 namespace NetworkMessage
 {
@@ -32,15 +28,9 @@ namespace NetworkMessage
             this.Parameter = MessageParameter;
             this.Username = Username;
         }
-        public Message()
-        {
-            
-        }
+        public Message() {}
 
-        public virtual byte[] getBytes()
-        {
-            return new byte[0];
-        }
+        public abstract byte[] getBytes();
     }
     public class MessageCommand : Message
     {

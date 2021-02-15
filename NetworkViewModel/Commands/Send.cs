@@ -20,7 +20,7 @@ namespace NetworkViewModel
 
         public void Execute(object parameter)
         {
-            Message outgoingMessage = new Message((MessageType)4, (DataType)0, Parent.Group.ToString(), Parent.Username, (string)parameter);
+            Message outgoingMessage = new MessageText((NetworkMessage.MsgType)4, (SubType)0, Parent.Group.ToString(), Parent.Username, (string)parameter);
             TCPConnection.Send(outgoingMessage.getBytes());
         }
     }

@@ -7,15 +7,15 @@ using System.Text;
 using System.Threading.Tasks;
 using NetworkMessage;
 
-namespace ServerLogic
+namespace Server
 {
-    class Logic
+    class ServerLogic
     {
         TcpListener listener;
         LinkedList<Client> connectedClients = new LinkedList<Client>();
         Action<string> consoleResponse;
 
-        public Logic(Action<string> consoleResponse)
+        public ServerLogic(Action<string> consoleResponse)
         {
             this.consoleResponse = consoleResponse;
         }
@@ -46,10 +46,25 @@ namespace ServerLogic
                 try
                 {
                     client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
-                    MessageType MessageType = (MessageType)client.data[0];
-                    Message incomingMessage = new Message(client.data);
-                    consoleResponse.Invoke("incomingMessage ...");
-                    Send(incomingMessage);
+                    MsgType MessageType = (MsgType)client.data[0];
+                    if (MessageType == MsgType.Command)
+                    {
+                        MessageCommand incomingMessage = new MessageCommand(client.data);
+                        consoleResponse.Invoke("incoming command ...");
+                        // do something;
+                    }
+                    else if (MessageType == MsgType.Data)
+                    {
+                        MessageData incomingMessage = new MessageData(client.data);
+                        consoleResponse.Invoke("incoming data message ...");
+                        // Send(incomingMessage);
+                    }
+                    else if (MessageType == MsgType.Text)
+                    {
+                        MessageText incomingMessage = new MessageText(client.data);
+                        consoleResponse.Invoke("incoming text message ...");
+                        Send(incomingMessage);
+                    }
                 }
                 catch
                 {
@@ -76,7 +91,7 @@ namespace ServerLogic
             }
             consoleResponse.Invoke("sending: " + message);
         }
-        public void Send(Message message)
+        public void Send(MessageText message)
         {
             foreach (var client in connectedClients)
             {

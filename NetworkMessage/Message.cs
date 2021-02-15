@@ -6,67 +6,131 @@ using System.Text;
 
 namespace NetworkMessage
 {
-    public enum MessageType : byte
+    public enum MsgType : byte
+    {
+        Command,
+        Data,
+        Text
+    }
+    public enum SubType : byte //TODO: more subtypes
     {
         Login,
         Logout,
-        LoginSuccessful,
-        LoginFail,
+        Direct,
         Group
     }
-    public enum DataType : byte
+    public abstract class Message
     {
-        Text,
-        File
-    }
-    public class Message
-    {
-        public MessageType MessageType;
-        public DataType DataType;
+        public MsgType Mtype;
+        public SubType Stype;
         public string Parameter;
         public string Username;
-        public string Text;
-        public byte[] Data;
-
-        public Message(MessageType MessageType, DataType DataType, string MessageParameter, string Username, string Text)
+        public Message(MsgType MessageType, SubType Stype, string MessageParameter, string Username)
         {
-            this.MessageType = MessageType;
-            this.DataType = DataType;
+            this.Mtype = MessageType;
+            this.Stype = Stype;
             this.Parameter = MessageParameter;
             this.Username = Username;
+        }
+        public Message()
+        {
+            
+        }
+
+        public virtual byte[] getBytes()
+        {
+            return new byte[0];
+        }
+    }
+    public class MessageCommand : Message
+    {
+        public string Command;
+        public MessageCommand(MsgType MessageType, SubType Stype, string MessageParameter, string Username, string Command) : base(MessageType, Stype, MessageParameter, Username)
+        {
+            this.Command = Command;
+        }
+        public MessageCommand(byte[] Data)
+        {
+            MsgType MessageType = (MsgType)Data[0];
+            SubType DataType = (SubType)Data[1];
+            byte ParamterLenght = Data[2];
+            byte UsernameLenght = Data[3];
+
+            int offset = 4;
+            string message = Encoding.ASCII.GetString(Data, offset, Data.Length - offset);
+            Parameter = message.Substring(0, ParamterLenght);
+            Username = message.Substring(ParamterLenght, UsernameLenght);
+            Command = message.Substring(ParamterLenght + UsernameLenght);
+        }
+        public override byte[] getBytes() //TODO: create more message types
+        {
+            string datastring = $"    {Parameter}{Username}{Command}";
+            byte[] data = Encoding.ASCII.GetBytes(datastring);
+            data[0] = (byte)MsgType.Command;
+            data[1] = (byte)SubType.Login;
+            data[2] = (byte)Parameter.Length;
+            data[3] = (byte)Username.Length;
+            return data;
+        }
+    }
+    public class MessageData : Message
+    {
+        public byte[] Data;
+        public MessageData(MsgType MessageType, SubType Stype, string MessageParameter, string Username, byte[] Data) : base (MessageType, Stype, MessageParameter, Username)
+        {
+            this.Data = Data;
+        }
+        public MessageData(byte[] Data)
+        {
+            MsgType MessageType = (MsgType)Data[0];
+            SubType DataType = (SubType)Data[1];
+            byte ParamterLenght = Data[2];
+            byte UsernameLenght = Data[3];
+
+            int offset = 4;
+            string message = Encoding.ASCII.GetString(Data, offset, ParamterLenght + UsernameLenght);
+            Parameter = message.Substring(0, ParamterLenght);
+            Username = message.Substring(ParamterLenght, UsernameLenght);
+            int fileoffset = offset + ParamterLenght + UsernameLenght;
+            Data = Data[fileoffset..];
+        }
+        public override byte[] getBytes() //TODO: correct {Data}
+        {
+            string datastring = $"    {Parameter}{Username}{Data}";
+            byte[] data = Encoding.ASCII.GetBytes(datastring);
+            data[0] = (byte)MsgType.Data;
+            data[1] = (byte)SubType.Login;
+            data[2] = (byte)Parameter.Length;
+            data[3] = (byte)Username.Length;
+            return data;
+        }
+    }
+    public class MessageText : Message
+    {
+        public string Text;
+        public MessageText(MsgType MessageType, SubType Stype, string MessageParameter, string Username, string Text) : base(MessageType, Stype, MessageParameter, Username)
+        {
             this.Text = Text;
         }
-        public Message(byte[] data)
+        public MessageText(byte[] Data)
         {
-            MessageType MessageType = (MessageType)data[0];
-            DataType DataType = (DataType)data[1];
-            byte ParamterLenght = data[2];
-            byte UsernameLenght = data[3];
+            MsgType MessageType = (MsgType)Data[0];
+            SubType DataType = (SubType)Data[1];
+            byte ParamterLenght = Data[2];
+            byte UsernameLenght = Data[3];
 
-            if (DataType == DataType.Text)
-            {
-                int offset = 4;
-                string message = Encoding.ASCII.GetString(data, offset, data.Length - offset);
-                Parameter = message.Substring(0, ParamterLenght);
-                Username = message.Substring(ParamterLenght, UsernameLenght);
-                Text = message.Substring(ParamterLenght + UsernameLenght);
-            }
-            else if (DataType == DataType.File) //TODO: file handling
-            {
-                int offset = 4;
-                string message = Encoding.ASCII.GetString(data, offset, ParamterLenght + UsernameLenght);
-                Parameter = message.Substring(0, ParamterLenght);
-                Username = message.Substring(ParamterLenght, UsernameLenght);
-                int fileoffset = offset + ParamterLenght + UsernameLenght;
-                Data = data[fileoffset..];
-            }
+            int offset = 4;
+            string message = Encoding.ASCII.GetString(Data, offset, Data.Length - offset);
+            Parameter = message.Substring(0, ParamterLenght);
+            Username = message.Substring(ParamterLenght, UsernameLenght);
+            Text = message.Substring(ParamterLenght + UsernameLenght);
         }
-        public byte[] getBytes() //TODO: create more message types
+        public override byte[] getBytes() //TODO: create more message types
         {
             string datastring = $"    {Parameter}{Username}{Text}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
-            data[0] = (byte)MessageType.Group;
-            data[1] = (byte)DataType.Text;
+            data[0] = (byte)MsgType.Text;
+            data[1] = (byte)SubType.Login;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
             return data;

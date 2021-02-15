@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using ServerLogic;
 
 namespace Server
 {
@@ -15,21 +14,21 @@ namespace Server
         status,
         exit
     }
-    class Program
+    class ServerMain
     {
         static void Main(string[] args)
         {
 
-            Logic ServerLogic = new Logic(ConsolePrint);
+            ServerLogic Logic = new ServerLogic(ConsolePrint);
             Console.WriteLine("server starting ...");
-            Start(ServerLogic);
-            WaitForCommands(ServerLogic);
+            Start(Logic);
+            WaitForCommands(Logic);
         }
-        static async void Start(Logic ServerLogic)
+        static async void Start(ServerLogic ServerLogic)
         {
             await Task.Run(() => ServerLogic.Start());
         }
-        static void WaitForCommands(Logic ServerLogic)
+        static void WaitForCommands(ServerLogic ServerLogic)
         {
             string command = "";
             while (command != commands.exit.ToString())

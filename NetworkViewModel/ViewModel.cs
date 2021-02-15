@@ -23,6 +23,7 @@ namespace NetworkViewModel
         string _message = "";
         bool _isConnected = false;
         string _chatBox = "";
+        string _testUser = "";
 
         public ViewModel()
         {
@@ -33,6 +34,18 @@ namespace NetworkViewModel
             TCPConnection.OnReceive = Receive;
 
             Username = rnd.Next(10000, 99999).ToString(); // random name
+        }
+        public string TestUser
+        {
+            get { return _testUser; }
+            set
+            {
+                if (_testUser != value)
+                {
+                    _testUser = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TestUser)));
+                }
+            }
         }
         public string Username
         {
@@ -135,4 +148,6 @@ namespace NetworkViewModel
             ChatBox += message + "\n";
         }
     }
+
+
 }

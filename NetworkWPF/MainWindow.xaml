@@ -31,6 +31,8 @@
         </StackPanel>
         <TextBox x:Name="tbChat" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ChatBox}" Grid.Row="1" Grid.Column="1" Drop="File_Drop" AllowDrop="true"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" >
+            <TextBox x:Name="tbTestUser" Width="100" Height="30" Text="{Binding TestUser}"/>
+            <Button x:Name="btnTest"  Width="100" Height="30" Content="_Test" Command="{Binding Send}" CommandParameter="{Binding ElementName=tbMessage, Path=Text}"/>
             <TextBox x:Name="tbMessage" Width="300" Height="30" Text="{Binding Message}"/>
             <Button x:Name="btnSend"  Width="100" Height="30" Content="_Send" Command="{Binding Send}" CommandParameter="{Binding ElementName=tbMessage, Path=Text}"/>
         </StackPanel>

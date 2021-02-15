@@ -24,11 +24,11 @@ namespace NetworkMessage
         public SubType Stype;
         public string Parameter;
         public string Username;
-        public Message(MsgType MessageType, SubType Stype, string MessageParameter, string Username)
+        public Message(MsgType MessageType, SubType Stype, string Parameter, string Username)
         {
             this.Mtype = MessageType;
             this.Stype = Stype;
-            this.Parameter = MessageParameter;
+            this.Parameter = Parameter;
             this.Username = Username;
         }
         public Message() {}
@@ -38,7 +38,7 @@ namespace NetworkMessage
     public class MessageCommand : Message
     {
         public string Command;
-        public MessageCommand(MsgType MessageType, SubType Stype, string MessageParameter = "", string Username = "", string Command = "") : base(MessageType, Stype, MessageParameter, Username)
+        public MessageCommand(MsgType MessageType, SubType Stype, string Parameter = "", string Username = "", string Command = "") : base(MessageType, Stype, Parameter, Username)
         {
             this.Command = Command;
         }
@@ -69,7 +69,7 @@ namespace NetworkMessage
     public class MessageData : Message
     {
         public byte[] Data;
-        public MessageData(MsgType MessageType, SubType Stype, string MessageParameter, string Username, byte[] Data) : base (MessageType, Stype, MessageParameter, Username)
+        public MessageData(MsgType MessageType, SubType Stype, string Parameter, string Username, byte[] Data) : base (MessageType, Stype, Parameter, Username)
         {
             this.Data = Data;
         }
@@ -101,8 +101,10 @@ namespace NetworkMessage
     public class MessageText : Message
     {
         public string Text;
-        public MessageText(MsgType MessageType, SubType Stype, string MessageParameter, string Username, string Text) : base(MessageType, Stype, MessageParameter, Username)
+        public MessageText(MsgType MessageType, SubType Stype, string Parameter, string Username, string Text) : base(MessageType, Stype, Parameter, Username)
         {
+            this.Parameter = Parameter;
+            this.Username = Username;
             this.Text = Text;
         }
         public MessageText(byte[] Data)

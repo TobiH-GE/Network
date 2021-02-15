@@ -20,8 +20,16 @@ namespace NetworkViewModel
 
         public void Execute(object parameter)
         {
-            Message outgoingMessage = new MessageText(MsgType.Text, SubType.Group, Parent.Group.ToString(), Parent.Username, (string)parameter);
-            TCPConnection.Send(outgoingMessage);
+            if (Parent.TestUser == "")
+            {
+                Message outgoingMessage = new MessageText(MsgType.Text, SubType.Group, Parent.Group.ToString(), Parent.Username, (string)parameter);
+                TCPConnection.Send(outgoingMessage);
+            }
+            else //TODO: remove? just for testing
+            {
+                Message outgoingMessage = new MessageText(MsgType.Text, SubType.Direct, Parent.TestUser, Parent.Username, (string)parameter);
+                TCPConnection.Send(outgoingMessage);
+            }
         }
     }
 }

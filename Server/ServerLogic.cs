@@ -56,14 +56,16 @@ namespace Server
                         MessageCommand incomingMessage = new MessageCommand(client.data);
                         if (SubType == SubType.Login)
                         {
-                            if (incomingMessage.Parameter == "password")
+
+                            if (incomingMessage.Parameter == "password") //TODO: remove, for testing
                             {
-                                consoleResponse.Invoke("password correct ...");
+                                consoleResponse.Invoke($"user {incomingMessage.Username} password correct ...");
+                                client.Username = incomingMessage.Username; //TODO: remove, for testing
                                 Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "login successful!"));
                             }
                             else
                             {
-                                consoleResponse.Invoke("password wrong ...");
+                                consoleResponse.Invoke($"user {incomingMessage.Username} password wrong ...");
                                 Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "password wrong!"));
                             }
                             // do something;
@@ -80,7 +82,8 @@ namespace Server
                         MessageText incomingMessage = new MessageText(client.data);
                         if (SubType == SubType.Direct)
                         {
-                            Send(incomingMessage.Parameter, incomingMessage);
+                            consoleResponse.Invoke("incoming direct text message ...");
+                            Send(incomingMessage);
                         }
                         else if (SubType == SubType.Group)
                         {
@@ -144,15 +147,19 @@ namespace Server
                 consoleResponse.Invoke("sending message to client ... ");
             }
         }
-        public void Send(string Username, Message message)
+        public void Send(Message message)
         {
             foreach (var client in connectedClients)
             {
-                if (client.Username != Username || client.connection == null || !client.connection.Connected) return; //TODO: client.connection
-                byte[] data;
-                data = message.getBytes();
-                client.connection.GetStream().Write(data, 0, data.Length);
-                consoleResponse.Invoke("sending message to user ... ");
+                if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
+                if (client.Username == message.Parameter)
+                {
+                    byte[] data;
+                    data = message.getBytes();
+                    client.connection.GetStream().Write(data, 0, data.Length);
+                    consoleResponse.Invoke("sending message to username ... ");
+                    break;
+                }
             }
         }
         public void Status()

@@ -11,6 +11,7 @@ namespace NetworkModel
         static TcpClient connection;
         static NetworkStream dataStream;
         static CancellationTokenSource cts;
+        public static string Username = "";
 
         public static Action<string> OnReceive;
         public static void Connect(string address, int port)
@@ -40,7 +41,7 @@ namespace NetworkModel
                         if (SubType == SubType.LoginRequest)
                         {
                             OnReceive.Invoke("server is requesting login data ...");
-                            Send(new MessageCommand(MsgType.Command, SubType.Login, "password"));
+                            Send(new MessageCommand(MsgType.Command, SubType.Login, "password", Username));
                             // do something
                         }
                     }

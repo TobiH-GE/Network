@@ -19,6 +19,7 @@ namespace NetworkViewModel
 
         public void Execute(object parameter)
         {
+            TCPConnection.Username = Parent.Username;
             TCPConnection.Connect(Parent.Address, Parent.Port);
             Parent.IsConnected = true;
         }

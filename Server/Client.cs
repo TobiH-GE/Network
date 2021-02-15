@@ -8,9 +8,10 @@ namespace Server
     {
         public TcpClient connection;
         public Task task;
+        public string Username;
         public int receivedBytes = 0;
         public byte[] data = new byte[1024];
-        public LinkedList<int> rooms = new LinkedList<int>();
+        public LinkedList<int> groupIDs = new LinkedList<int>();
         public Client(TcpClient connection)
         {
             this.connection = connection;

@@ -49,6 +49,7 @@ namespace Server
                     client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
                     MsgType MessageType = (MsgType)client.data[0];
                     SubType SubType = (SubType)client.data[1];
+
                     if (MessageType == MsgType.Command)
                     {
                         consoleResponse.Invoke("incoming command ...");
@@ -56,10 +57,15 @@ namespace Server
                         if (SubType == SubType.Login)
                         {
                             if (incomingMessage.Parameter == "password")
+                            {
                                 consoleResponse.Invoke("password correct ...");
+                                Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "login successful!"));
+                            }
                             else
+                            {
                                 consoleResponse.Invoke("password wrong ...");
-
+                                Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "password wrong!"));
+                            }
                             // do something;
                         }
                     }
@@ -72,8 +78,20 @@ namespace Server
                     else if (MessageType == MsgType.Text)
                     {
                         MessageText incomingMessage = new MessageText(client.data);
-                        consoleResponse.Invoke("incoming text message ...");
-                        SendAll(incomingMessage);
+                        if (SubType == SubType.Direct)
+                        {
+                            Send(incomingMessage.Parameter, incomingMessage);
+                        }
+                        else if (SubType == SubType.Group)
+                        {
+                            consoleResponse.Invoke("incoming group text message ...");
+                            SendAll(incomingMessage); //TODO: send only to group
+                        }
+                        else if (SubType == SubType.Broadcast)
+                        {
+                            consoleResponse.Invoke("incoming broadcast text message ...");
+                            SendAll(incomingMessage);
+                        }
                     }
                     else
                     {
@@ -124,6 +142,17 @@ namespace Server
                 data = message.getBytes();
                 client.connection.GetStream().Write(data, 0, data.Length);
                 consoleResponse.Invoke("sending message to client ... ");
+            }
+        }
+        public void Send(string Username, Message message)
+        {
+            foreach (var client in connectedClients)
+            {
+                if (client.Username != Username || client.connection == null || !client.connection.Connected) return; //TODO: client.connection
+                byte[] data;
+                data = message.getBytes();
+                client.connection.GetStream().Write(data, 0, data.Length);
+                consoleResponse.Invoke("sending message to user ... ");
             }
         }
         public void Status()

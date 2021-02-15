@@ -103,8 +103,6 @@ namespace NetworkMessage
         public string Text;
         public MessageText(MsgType MessageType, SubType Stype, string Parameter, string Username, string Text) : base(MessageType, Stype, Parameter, Username)
         {
-            this.Parameter = Parameter;
-            this.Username = Username;
             this.Text = Text;
         }
         public MessageText(byte[] Data)

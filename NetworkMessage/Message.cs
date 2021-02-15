@@ -57,8 +57,8 @@ namespace NetworkMessage
         {
             string datastring = $"    {Parameter}{Username}{Command}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
-            data[0] = (byte)MsgType.Command;
-            data[1] = (byte)SubType.Login;
+            data[0] = (byte)Mtype;
+            data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
             return data;
@@ -89,8 +89,8 @@ namespace NetworkMessage
         {
             string datastring = $"    {Parameter}{Username}{Data}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
-            data[0] = (byte)MsgType.Data;
-            data[1] = (byte)SubType.Login;
+            data[0] = (byte)Mtype;
+            data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
             return data;
@@ -120,8 +120,8 @@ namespace NetworkMessage
         {
             string datastring = $"    {Parameter}{Username}{Text}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
-            data[0] = (byte)MsgType.Text;
-            data[1] = (byte)SubType.Login;
+            data[0] = (byte)Mtype;
+            data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
             return data;

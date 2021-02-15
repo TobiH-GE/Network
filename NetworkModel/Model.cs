@@ -40,6 +40,7 @@ namespace NetworkModel
                         if (SubType == SubType.LoginRequest)
                         {
                             OnReceive.Invoke("server is requesting login data ...");
+                            Send(new MessageCommand(MsgType.Command, SubType.Login, "password"));
                             // do something
                         }
                     }
@@ -66,8 +67,9 @@ namespace NetworkModel
                 }
             }
         }
-        public static void Send(byte[] data)
+        public static void Send(Message message)
         {
+            byte[] data = message.getBytes();
             dataStream.Write(data, 0, data.Length);
         }
         public static void Disconnect()

@@ -46,7 +46,8 @@ namespace Server
             {
                 try
                 {
-                    client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length));
+                    client.data = new byte[1024];
+                    client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length)); // TODO: use client.data.AsMemory???
                     MsgType MessageType = (MsgType)client.data[0];
                     SubType SubType = (SubType)client.data[1];
 

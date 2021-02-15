@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -65,10 +64,14 @@ namespace Server
                         consoleResponse.Invoke("incoming text message ...");
                         Send(incomingMessage);
                     }
+                    else
+                    {
+                        consoleResponse.Invoke("incoming unknown message type ...");
+                    }
                 }
                 catch
                 {
-                    consoleResponse.Invoke("error: ...");
+                    consoleResponse.Invoke("ReceiveData_Async error: ...");
                     //TODO: error
                 }
                 if (client.receivedBytes < 1)
@@ -100,7 +103,7 @@ namespace Server
                 data = message.getBytes();
                 client.connection.GetStream().Write(data, 0, data.Length);
             }
-            consoleResponse.Invoke("sending message ... ");
+            consoleResponse.Invoke("sending text message ... ");
         }
         public void Status()
         {

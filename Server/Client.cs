@@ -26,9 +26,11 @@ namespace Server
                     return false;
             }
         }
-    }
-    public class Room
-    {
-        int id;
+        public bool Send(byte[] data)
+        {
+            if (connection == null || !connection.Connected) return false;
+            connection.GetStream().Write(data, 0, data.Length);
+            return true;
+        }
     }
 }

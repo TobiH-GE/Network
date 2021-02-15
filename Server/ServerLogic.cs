@@ -25,7 +25,6 @@ namespace Server
                 listener = new TcpListener(IPAddress.Any, 1337);
                 listener.Start();
             }
-
             consoleResponse.Invoke("waiting for clients ...");
 
             while (true)
@@ -55,13 +54,13 @@ namespace Server
                     {
                         consoleResponse.Invoke("incoming command ...");
                         MessageCommand incomingMessage = new MessageCommand(client.data);
-                        if (SubType == SubType.Login)
+                        if (SubType == SubType.Login) //TODO: check correct password in database
                         {
 
-                            if (incomingMessage.Parameter == "password") //TODO: remove, for testing
+                            if (incomingMessage.Parameter == "password") 
                             {
                                 consoleResponse.Invoke($"user {incomingMessage.Username} password correct ...");
-                                client.Username = incomingMessage.Username; //TODO: remove, for testing
+                                client.Username = incomingMessage.Username;
                                 Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "login successful!"));
                             }
                             else
@@ -69,7 +68,6 @@ namespace Server
                                 consoleResponse.Invoke($"user {incomingMessage.Username} password wrong ...");
                                 Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "password wrong!"));
                             }
-                            // do something;
                         }
                     }
                     else if (MessageType == MsgType.Data)
@@ -118,46 +116,35 @@ namespace Server
         }
         public void SendAll(string message)
         {
+            byte[] data = Encoding.ASCII.GetBytes(message);
             foreach (var client in connectedClients)
             {
-                if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
-                byte[] data;
-                data = Encoding.ASCII.GetBytes(message);
-                client.connection.GetStream().Write(data, 0, data.Length);
+                if (!client.Send(data)) return;
             }
             consoleResponse.Invoke("sending text to all: " + message);
         }
         public void SendAll(Message message)
         {
+            byte[] data = message.getBytes();
             foreach (var client in connectedClients)
             {
-                if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
-                byte[] data;
-                data = message.getBytes();
-                client.connection.GetStream().Write(data, 0, data.Length);
+                if (!client.Send(data)) return;
             }
             consoleResponse.Invoke("sending message to all ... ");
         }
         public void Send(Client client, Message message)
         {
-            if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
-            {
-                byte[] data;
-                data = message.getBytes();
-                client.connection.GetStream().Write(data, 0, data.Length);
-                consoleResponse.Invoke("sending message to client ... ");
-            }
+            if (!client.Send(message.getBytes())) return;
+            consoleResponse.Invoke("sending message to client ... ");
         }
         public void Send(Message message)
         {
             foreach (var client in connectedClients)
             {
-                if (client.connection == null || !client.connection.Connected) return; //TODO: client.connection
+                if (client.connection == null || !client.connection.Connected) return;
                 if (client.Username == message.Parameter)
                 {
-                    byte[] data;
-                    data = message.getBytes();
-                    client.connection.GetStream().Write(data, 0, data.Length);
+                    client.Send(message.getBytes());
                     consoleResponse.Invoke("sending message to username ... ");
                     break;
                 }

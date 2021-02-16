@@ -14,6 +14,7 @@ namespace NetworkViewModel
         public ICommand Connect { get; init; }
         public ICommand Send { get; init; }
         public ICommand Disconnect { get; init; }
+        public ICommand Join { get; init; }
 
         Random rnd = new Random();
 
@@ -45,6 +46,7 @@ namespace NetworkViewModel
             Connect = new Connect() { Parent = this };
             Send = new Send() { Parent = this };
             Disconnect = new Disconnect() { Parent = this };
+            Join = new Join() { Parent = this };
 
             TCPConnection.OnReceive = Receive;
             TCPConnection.OnJoinOk = JoinRoom;

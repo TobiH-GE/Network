@@ -28,6 +28,9 @@
             <CheckBox x:Name="cbConnected" IsChecked="{Binding IsConnected}"/>
             <Button x:Name="btnConnect" Content="_Connect" Width="100" Command="{Binding Connect}"/>
             <Button x:Name="btnDisconnect" Content="_Disconnect" Width="100" Command="{Binding Disconnect}"/>
+            <Label Content="create or join room"/>
+            <TextBox x:Name="tbRoom" Text=""/>
+            <Button x:Name="btnJoin" Content="_Join" Width="100" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoom, Path=Text}"/>
         </StackPanel>
         <ItemsControl x:Name="RoomsList" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding RoomsButtons}">
             <ItemsControl.ItemsPanel>

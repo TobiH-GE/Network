@@ -15,17 +15,17 @@ namespace NetworkViewModel
         public ICommand Send { get; init; }
         public ICommand Disconnect { get; init; }
         public ICommand Join { get; init; }
+        public ICommand SetActiveRoom { get; init; }
 
         Random rnd = new Random();
 
         string _username = "";
-        int _roomID = 1; // TODO: remove!
         string _password = "password";
         string _address = "127.0.0.1";
         int _port = 1337;
         string _message = "";
         bool _isConnected = false;
-        string _statusContent = "";
+        string _selectedRoom = "";
 
         ObservableCollection<Room> _rooms = new ObservableCollection<Room>();
         public ObservableCollection<Room> Rooms
@@ -47,6 +47,7 @@ namespace NetworkViewModel
             Send = new Send() { Parent = this };
             Disconnect = new Disconnect() { Parent = this };
             Join = new Join() { Parent = this };
+            SetActiveRoom = new SetActiveRoom() { Parent = this };
 
             TCPConnection.OnReceive = Receive;
             TCPConnection.OnJoinOk = JoinRoom;
@@ -54,7 +55,7 @@ namespace NetworkViewModel
 
             Username = rnd.Next(10000, 99999).ToString(); // random name
 
-            Rooms.Add(new Room() { Name = "Status", Users = 2 });
+            Rooms.Add(new Room() { Name = "Status", Users = 0, Height = 400 });
         }
         public class Room : INotifyPropertyChanged
         {
@@ -126,15 +127,26 @@ namespace NetworkViewModel
                 }
             }
         }
-        public int RoomID
+        public string SelectedRoom
         {
-            get { return _roomID; }
+            get { return _selectedRoom; }
             set
             {
-                if (_roomID != value)
+                if (_selectedRoom != value)
                 {
-                    _roomID = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RoomID)));
+                    _selectedRoom = value;
+                    foreach (var item in Rooms)
+                    {
+                        if (item.Name == value)
+                        {
+                            item.Height = 400;
+                        }
+                        else
+                        {
+                            item.Height = 0;
+                        }
+                    }
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedRoom)));
                 }
             }
         }
@@ -198,35 +210,17 @@ namespace NetworkViewModel
                 }
             }
         }
-        public string StatusContent
-        {
-            get { return _statusContent; }
-            set
-            {
-                if (_statusContent != value)
-                {
-                    _statusContent = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusContent)));
-                }
-            }
-        }
         void Receive(string destination, string message)
         {
-            if (destination == "Status")
-                StatusContent += message + "\n";
-            else
+            foreach (var item in Rooms)
             {
-                foreach (var item in Rooms)
+                if (item.Name == destination)
                 {
-                    if (item.Name == destination)
-                    {
-                        item.Height = 400;
-                        item.Content += message + "\n";
-                    }
-                    else
-                    {
-                        item.Height = 0;
-                    }
+                    item.Content += message + "\n";
+                }
+                else
+                {
+                    item.Height = 0;
                 }
             }
         }

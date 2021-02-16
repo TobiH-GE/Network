@@ -40,7 +40,8 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Content="{Binding Name}" Margin="0,0,5,5" />
+                    <!--<Button Margin="5" Content="{Binding Name}" Command="{Binding SetActiveRoom}" CommandParameter="{Binding Name}"/>-->
+                    <Button Margin="5" Content="{Binding Name}" Click="RoomButton_Click"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -51,7 +52,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <TextBox x:Name="tbStatus" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding StatusContent}" Grid.Row="1" Grid.Column="1" Drop="File_Drop" AllowDrop="true" Height="100"/>
+        <!--<TextBox x:Name="tbStatus" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding StatusContent}" Grid.Row="1" Grid.Column="1" Drop="File_Drop" AllowDrop="true" Height="100"/>-->
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" >
             <TextBox x:Name="tbMessage" Width="400" Height="30" Text="{Binding Message}"/>
             <Button x:Name="btnSend"  Width="100" Height="30" Content="_Send" Command="{Binding Send}" CommandParameter="{Binding ElementName=tbMessage, Path=Text}"/>

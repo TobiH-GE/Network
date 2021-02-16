@@ -1,5 +1,6 @@
 ﻿using NetworkViewModel;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Network
 {
@@ -22,6 +23,10 @@ namespace Network
                 var file = files[0];
                 // HandleFile(file);
             }
+        }
+        private void RoomButton_Click(object sender, RoutedEventArgs e)
+        {
+            ((ViewModel)DataContext).SelectedRoom = ((Button)sender).Content.ToString();
         }
     }
 }

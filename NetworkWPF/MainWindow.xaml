@@ -29,10 +29,10 @@
             <Button x:Name="btnConnect" Content="_Connect" Width="100" Command="{Binding Connect}"/>
             <Button x:Name="btnDisconnect" Content="_Disconnect" Width="100" Command="{Binding Disconnect}"/>
             <Label Content="create or join room"/>
-            <TextBox x:Name="tbRoom" Text=""/>
-            <Button x:Name="btnJoin" Content="_Join" Width="100" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoom, Path=Text}"/>
+            <TextBox x:Name="tbRoomname" Text=""/>
+            <Button x:Name="btnJoin" Content="_Join" Width="100" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoomname, Path=Text}"/>
         </StackPanel>
-        <ItemsControl x:Name="RoomsList" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding RoomsButtons}">
+        <ItemsControl x:Name="RoomsButtons" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Rooms}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />
@@ -44,7 +44,14 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <TextBox x:Name="tbChat" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding ChatBox}" Grid.Row="1" Grid.Column="1" Drop="File_Drop" AllowDrop="true"/>
+        <ItemsControl x:Name="RoomsContent" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Rooms}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding Content}" Drop="File_Drop" AllowDrop="true" Height="{Binding Height}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBox x:Name="tbStatus" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding StatusContent}" Grid.Row="1" Grid.Column="1" Drop="File_Drop" AllowDrop="true" Height="100"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" >
             <TextBox x:Name="tbMessage" Width="400" Height="30" Text="{Binding Message}"/>
             <Button x:Name="btnSend"  Width="100" Height="30" Content="_Send" Command="{Binding Send}" CommandParameter="{Binding ElementName=tbMessage, Path=Text}"/>

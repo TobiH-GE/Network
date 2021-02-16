@@ -13,7 +13,7 @@ namespace NetworkModel
         static CancellationTokenSource cts;
         public static string Username = "";
 
-        public static Action<string> OnReceive;
+        public static Action<string,string> OnReceive;
         public static Action<string> OnJoinOk;
         public static Action<string> OnLeaveOk;
         public static void Connect(string address, int port)
@@ -42,18 +42,18 @@ namespace NetworkModel
                         MessageCommand incomingMessage = new MessageCommand(data);
                         if (SubType == SubType.LoginRequest)
                         {
-                            OnReceive.Invoke("server is requesting login data ...");
+                            OnReceive.Invoke("Status", "server is requesting login data ...");
                             Send(new MessageCommand(MsgType.Command, SubType.Login, "password", Username));
                             // do something
                         }
                         else if(SubType == SubType.JoinOk)
                         {
-                            OnReceive.Invoke($"joining room {incomingMessage.Parameter}.");
+                            OnReceive.Invoke("Status", $"joining room {incomingMessage.Parameter}.");
                             OnJoinOk.Invoke(incomingMessage.Parameter);
                         }
                         else if (SubType == SubType.LeaveOk)
                         {
-                            OnReceive.Invoke($"leaving room {incomingMessage.Parameter}.");
+                            OnReceive.Invoke("Status", $"leaving room {incomingMessage.Parameter}.");
                             OnLeaveOk.Invoke(incomingMessage.Parameter);
                         }
                     }
@@ -65,12 +65,20 @@ namespace NetworkModel
                     else if (MessageType == MsgType.Text)
                     {
                         MessageText incomingMessage = new MessageText(data);
-                        OnReceive.Invoke(incomingMessage.Username + ": " + incomingMessage.Text);
+
+                        if (SubType == SubType.Room)
+                        {
+                            OnReceive.Invoke(incomingMessage.Parameter, incomingMessage.Username + ": " + incomingMessage.Text);
+                        }
+                        else
+                        {
+                            OnReceive.Invoke("Status", incomingMessage.Username + ": " + incomingMessage.Text);
+                        }
                     }
                 }
                 catch (Exception)
                 {
-                    OnReceive.Invoke("(connection error or connection aborted)");
+                    OnReceive.Invoke("Status", "(connection error or connection aborted)");
                     Disconnect();
                 }
                 if (receivedBytes < 1) // TODO: optimize, remove bug

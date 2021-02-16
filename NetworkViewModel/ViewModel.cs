@@ -25,18 +25,18 @@ namespace NetworkViewModel
         int _port = 1337;
         string _message = "";
         bool _isConnected = false;
-        string _chatBox = "";
+        string _statusContent = "";
 
-        ObservableCollection<Room> _roomsButtons = new ObservableCollection<Room>();
-        public ObservableCollection<Room> RoomsButtons
+        ObservableCollection<Room> _rooms = new ObservableCollection<Room>();
+        public ObservableCollection<Room> Rooms
         {
-            get { return _roomsButtons; }
+            get { return _rooms; }
             set
             {
-                if (_roomsButtons != value)
+                if (_rooms != value)
                 {
-                    _roomsButtons = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RoomsButtons)));
+                    _rooms = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Rooms)));
                 }
             }
         }
@@ -54,9 +54,7 @@ namespace NetworkViewModel
 
             Username = rnd.Next(10000, 99999).ToString(); // random name
 
-            RoomsButtons.Add(new Room() { Name = "Chat1", Users = 2 });
-            RoomsButtons.Add(new Room() { Name = "Chat2", Users = 5 });
-            RoomsButtons.Add(new Room() { Name = "Chat3", Users = 6 });
+            Rooms.Add(new Room() { Name = "Status", Users = 2 });
         }
         public class Room : INotifyPropertyChanged
         {
@@ -64,6 +62,8 @@ namespace NetworkViewModel
 
             string _name = "";
             int _users = 0;
+            string _content;
+            int _height = 0;
 
             public string Name
             {
@@ -86,6 +86,30 @@ namespace NetworkViewModel
                     {
                         _users = value;
                         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Users)));
+                    }
+                }
+            }
+            public string Content
+            {
+                get { return _content; }
+                set
+                {
+                    if (_content != value)
+                    {
+                        _content = value;
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Content)));
+                    }
+                }
+            }
+            public int Height
+            {
+                get { return _height; }
+                set
+                {
+                    if (_height != value)
+                    {
+                        _height = value;
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Height)));
                     }
                 }
             }
@@ -174,33 +198,49 @@ namespace NetworkViewModel
                 }
             }
         }
-        public string ChatBox
+        public string StatusContent
         {
-            get { return _chatBox; }
+            get { return _statusContent; }
             set
             {
-                if (_chatBox != value)
+                if (_statusContent != value)
                 {
-                    _chatBox = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ChatBox)));
+                    _statusContent = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusContent)));
                 }
             }
         }
-        void Receive(string message)
+        void Receive(string destination, string message)
         {
-            ChatBox += message + "\n";
+            if (destination == "Status")
+                StatusContent += message + "\n";
+            else
+            {
+                foreach (var item in Rooms)
+                {
+                    if (item.Name == destination)
+                    {
+                        item.Height = 400;
+                        item.Content += message + "\n";
+                    }
+                    else
+                    {
+                        item.Height = 0;
+                    }
+                }
+            }
         }
         void JoinRoom(string room)
         {
-            RoomsButtons.Add(new Room() { Name = room, Users = 2 });
+            Rooms.Add(new Room() { Name = room, Users = 2 });
         }
         void LeaveRoom(string room)
         {
-            foreach (var item in RoomsButtons)
+            foreach (var item in Rooms)
             {
                 if (item.Name == room)
                 {
-                    RoomsButtons.Remove(item);
+                    Rooms.Remove(item);
                     break;
                 }
             }

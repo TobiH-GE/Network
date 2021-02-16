@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using NetworkModel;
@@ -16,14 +18,27 @@ namespace NetworkViewModel
         Random rnd = new Random();
 
         string _username = "";
-        int _group = 1; // room id
+        int _roomID = 1; // TODO: remove!
         string _password = "password";
         string _address = "127.0.0.1";
         int _port = 1337;
         string _message = "";
         bool _isConnected = false;
         string _chatBox = "";
-        string _testUser = "";
+
+        ObservableCollection<Room> _roomsButtons = new ObservableCollection<Room>();
+        public ObservableCollection<Room> RoomsButtons
+        {
+            get { return _roomsButtons; }
+            set
+            {
+                if (_roomsButtons != value)
+                {
+                    _roomsButtons = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RoomsButtons)));
+                }
+            }
+        }
 
         public ViewModel()
         {
@@ -32,18 +47,44 @@ namespace NetworkViewModel
             Disconnect = new Disconnect() { Parent = this };
 
             TCPConnection.OnReceive = Receive;
+            TCPConnection.OnJoinOk = JoinRoom;
+            TCPConnection.OnLeaveOk = LeaveRoom;
 
             Username = rnd.Next(10000, 99999).ToString(); // random name
+
+            RoomsButtons.Add(new Room() { Name = "Chat1", Users = 2 });
+            RoomsButtons.Add(new Room() { Name = "Chat2", Users = 5 });
+            RoomsButtons.Add(new Room() { Name = "Chat3", Users = 6 });
         }
-        public string TestUser
+        public class Room : INotifyPropertyChanged
         {
-            get { return _testUser; }
-            set
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            string _name = "";
+            int _users = 0;
+
+            public string Name
             {
-                if (_testUser != value)
+                get { return _name; }
+                set
                 {
-                    _testUser = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TestUser)));
+                    if (_name != value)
+                    {
+                        _name = value;
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                    }
+                }
+            }
+            public int Users
+            {
+                get { return _users; }
+                set
+                {
+                    if (_users != value)
+                    {
+                        _users = value;
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Users)));
+                    }
                 }
             }
         }
@@ -59,15 +100,15 @@ namespace NetworkViewModel
                 }
             }
         }
-        public int Group
+        public int RoomID
         {
-            get { return _group; }
+            get { return _roomID; }
             set
             {
-                if (_group != value)
+                if (_roomID != value)
                 {
-                    _group = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Group)));
+                    _roomID = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RoomID)));
                 }
             }
         }
@@ -147,7 +188,20 @@ namespace NetworkViewModel
         {
             ChatBox += message + "\n";
         }
+        void JoinRoom(string room)
+        {
+            RoomsButtons.Add(new Room() { Name = room, Users = 2 });
+        }
+        void LeaveRoom(string room)
+        {
+            foreach (var item in RoomsButtons)
+            {
+                if (item.Name == room)
+                {
+                    RoomsButtons.Remove(item);
+                    break;
+                }
+            }
+        }
     }
-
-
 }

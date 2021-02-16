@@ -14,9 +14,13 @@ namespace NetworkMessage
         LoginRequest,
         Logout,
         Direct,
-        Group,
+        Room,
         Broadcast,
-        Info
+        Info,
+        JoinRoom,
+        JoinOk,
+        LeaveRoom,
+        LeaveOk
     }
     public abstract class Message
     {

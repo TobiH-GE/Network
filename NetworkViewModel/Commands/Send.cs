@@ -20,14 +20,33 @@ namespace NetworkViewModel
 
         public void Execute(object parameter)
         {
-            if (Parent.TestUser == "")
+            if (((string)parameter).Length >= 7 && ((string)parameter)[..5] == "/join")
             {
-                Message outgoingMessage = new MessageText(MsgType.Text, SubType.Group, Parent.Group.ToString(), Parent.Username, (string)parameter);
+                Message outgoingMessage = new MessageCommand(MsgType.Command, SubType.JoinRoom, ((string)parameter)[6..], Parent.Username, "");
                 TCPConnection.Send(outgoingMessage);
             }
-            else //TODO: remove? just for testing
+            else if (((string)parameter).Length >= 7 && ((string)parameter)[..5] == "/send")
             {
-                Message outgoingMessage = new MessageText(MsgType.Text, SubType.Direct, Parent.TestUser, Parent.Username, (string)parameter);
+                string[] array = ((string)parameter).Split(' ');
+                Message outgoingMessage = new MessageCommand(MsgType.Text, SubType.Direct, array[1], Parent.Username, array[2]);
+                TCPConnection.Send(outgoingMessage);
+            }
+            else if (((string)parameter).Length >= 7 && ((string)parameter)[..5] == "/room")
+            {
+                string[] array = ((string)parameter).Split(' ');
+                if (array[0] == null || array[1] == null || array[2] == null) return;
+                Message outgoingMessage = new MessageCommand(MsgType.Text, SubType.Room, array[1], Parent.Username, array[2]);
+                TCPConnection.Send(outgoingMessage);
+            }
+            else if (((string)parameter).Length >= 8 && ((string)parameter)[..6] == "/leave")
+            {
+                string[] array = ((string)parameter).Split(' ');
+                Message outgoingMessage = new MessageCommand(MsgType.Command, SubType.LeaveRoom, ((string)parameter)[7..], Parent.Username, "");
+                TCPConnection.Send(outgoingMessage);
+            }
+            else
+            {
+                Message outgoingMessage = new MessageText(MsgType.Text, SubType.Broadcast, Parent.RoomID.ToString(), Parent.Username, (string)parameter);
                 TCPConnection.Send(outgoingMessage);
             }
         }

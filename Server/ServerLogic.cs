@@ -56,7 +56,6 @@ namespace Server
                         MessageCommand incomingMessage = new MessageCommand(client.data);
                         if (SubType == SubType.Login) //TODO: check correct password in database
                         {
-
                             if (incomingMessage.Parameter == "password") 
                             {
                                 consoleResponse.Invoke($"user {incomingMessage.Username} password correct ...");
@@ -68,6 +67,18 @@ namespace Server
                                 consoleResponse.Invoke($"user {incomingMessage.Username} password wrong ...");
                                 Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "password wrong!"));
                             }
+                        }
+                        else if(SubType == SubType.JoinRoom)
+                        {
+                            client.Rooms.AddLast(incomingMessage.Parameter);
+                            Send(client, new MessageCommand(MsgType.Command, SubType.JoinOk, incomingMessage.Parameter, "", ""));
+                            Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", $"you joined room {incomingMessage.Parameter}."));
+                        }
+                        else if (SubType == SubType.LeaveRoom)
+                        {
+                            client.Rooms.Remove(incomingMessage.Parameter);
+                            Send(client, new MessageCommand(MsgType.Command, SubType.LeaveOk, incomingMessage.Parameter, "", ""));
+                            Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", $"you left room {incomingMessage.Parameter}."));
                         }
                     }
                     else if (MessageType == MsgType.Data)
@@ -84,10 +95,10 @@ namespace Server
                             consoleResponse.Invoke("incoming direct text message ...");
                             Send(incomingMessage);
                         }
-                        else if (SubType == SubType.Group)
+                        else if (SubType == SubType.Room)
                         {
                             consoleResponse.Invoke("incoming group text message ...");
-                            SendAll(incomingMessage); //TODO: send only to group
+                            SendGroup(incomingMessage); //TODO: send only to room
                         }
                         else if (SubType == SubType.Broadcast)
                         {
@@ -131,6 +142,18 @@ namespace Server
                 if (!client.Send(data)) return;
             }
             consoleResponse.Invoke("sending message to all ... ");
+        }
+        public void SendGroup(Message message)
+        {
+            foreach (var client in connectedClients)
+            {
+                if (client.connection == null || !client.connection.Connected) return;
+                if (client.Rooms.Contains(message.Parameter))
+                {
+                    client.Send(message.getBytes());
+                }
+            }
+            consoleResponse.Invoke("sending message to group ... ");
         }
         public void Send(Client client, Message message)
         {

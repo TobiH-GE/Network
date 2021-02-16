@@ -14,6 +14,8 @@ namespace NetworkModel
         public static string Username = "";
 
         public static Action<string> OnReceive;
+        public static Action<string> OnJoinOk;
+        public static Action<string> OnLeaveOk;
         public static void Connect(string address, int port)
         {
             connection = new TcpClient();
@@ -43,6 +45,16 @@ namespace NetworkModel
                             OnReceive.Invoke("server is requesting login data ...");
                             Send(new MessageCommand(MsgType.Command, SubType.Login, "password", Username));
                             // do something
+                        }
+                        else if(SubType == SubType.JoinOk)
+                        {
+                            OnReceive.Invoke($"joining room {incomingMessage.Parameter}.");
+                            OnJoinOk.Invoke(incomingMessage.Parameter);
+                        }
+                        else if (SubType == SubType.LeaveOk)
+                        {
+                            OnReceive.Invoke($"leaving room {incomingMessage.Parameter}.");
+                            OnLeaveOk.Invoke(incomingMessage.Parameter);
                         }
                     }
                     else if (MessageType == MsgType.Data)

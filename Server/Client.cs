@@ -11,7 +11,7 @@ namespace Server
         public string Username;
         public int receivedBytes = 0;
         public byte[] data = new byte[1024];
-        public LinkedList<int> groupIDs = new LinkedList<int>();
+        public LinkedList<string> Rooms = new LinkedList<string>();
         public Client(TcpClient connection)
         {
             this.connection = connection;

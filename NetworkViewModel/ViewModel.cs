@@ -154,7 +154,7 @@ namespace NetworkViewModel
                 }
             }
         }
-        void Receive(string destination, string message)
+        void Receive(string destination, string message) //TODO: move to model
         {
             foreach (var item in Rooms)
             {
@@ -164,12 +164,12 @@ namespace NetworkViewModel
                 }
             }
         }
-        void JoinRoom(string room)
+        void JoinRoom(string room) //TODO: move to model
         {
             Rooms.Add(new Room() { Name = room, Users = 2 });
             SelectedRoom = room;
         }
-        void LeaveRoom(string room)
+        void LeaveRoom(string room) //TODO: move to model
         {
             foreach (var item in Rooms)
             {

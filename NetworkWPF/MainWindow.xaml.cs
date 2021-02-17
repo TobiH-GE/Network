@@ -32,42 +32,4 @@ namespace Network
             ((ViewModel)DataContext).SelectedRoom = ((Button)sender).Content.ToString();
         }
     }
-    public class BoolToVisibility : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is bool == false) throw new ArgumentException();
-            if ((bool)value == true)
-                return Visibility.Visible;
-            else
-                return Visibility.Collapsed;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value;
-        }
-    }
-    public class BoolToStyle : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is bool == false) throw new ArgumentException();
-            if ((bool)value == true)
-            {
-                Style returnStyle = Application.Current.FindResource((string)parameter + "True") as Style;
-                return returnStyle;
-            }
-            else
-            {
-                Style returnStyle = Application.Current.FindResource((string)parameter + "False") as Style;
-                return returnStyle;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value;
-        }
-    }
 }

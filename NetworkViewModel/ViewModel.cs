@@ -15,6 +15,7 @@ namespace NetworkViewModel
         public ICommand Send { get; init; }
         public ICommand Disconnect { get; init; }
         public ICommand Join { get; init; }
+        public ICommand Leave { get; init; }
         public ICommand SetActiveRoom { get; init; }
 
         Random rnd = new Random();
@@ -47,6 +48,7 @@ namespace NetworkViewModel
             Send = new Send() { Parent = this };
             Disconnect = new Disconnect() { Parent = this };
             Join = new Join() { Parent = this };
+            Leave = new Leave() { Parent = this };
             SetActiveRoom = new SetActiveRoom() { Parent = this };
 
             TCPConnection.OnReceive = Receive;
@@ -174,6 +176,7 @@ namespace NetworkViewModel
                 if (item.Name == room)
                 {
                     Rooms.Remove(item);
+                    SelectedRoom = "Status";
                     break;
                 }
             }

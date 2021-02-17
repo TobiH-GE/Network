@@ -4,32 +4,47 @@
              xmlns:local="clr-namespace:Network"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style x:Key="RoomButtonTrue" TargetType="Button">
-            <Setter Property="Margin" Value="0,0,2,0" />
-            <Setter Property="Padding" Value="3" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#ccc" Offset="0"/>
-                        <GradientStop Color="#fff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+        <Style x:Key="RoomButton" TargetType="Button">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Selected}" Value="true">
+                    <Setter Property="Margin" Value="0,0,2,0" />
+                    <Setter Property="Padding" Value="3" />
+                    <Setter Property="BorderThickness" Value="1,1,1,0" />
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#ccc" Offset="0"/>
+                                <GradientStop Color="#fff" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Selected}" Value="false">
+                    <Setter Property="Margin" Value="0,0,2,2" />
+                    <Setter Property="Padding" Value="3,3,3,1" />
+                    <Setter Property="BorderThickness" Value="1,1,1,0" />
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#eee" Offset="0"/>
+                                <GradientStop Color="#fff" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="DarkGray" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
-        <Style x:Key="RoomButtonFalse" TargetType="Button">
-            <Setter Property="Margin" Value="0,0,2,2" />
-            <Setter Property="Padding" Value="3,3,3,1" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#eee" Offset="0"/>
-                        <GradientStop Color="#fff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Foreground" Value="DarkGray" />
+
+        <Style x:Key="RoomWindow" TargetType="TextBox">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Selected}" Value="true">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Selected}" Value="false">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </Application.Resources>
 </Application>

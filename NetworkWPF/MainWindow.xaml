@@ -36,7 +36,7 @@
             <Label Content="create or join room"/>
             <TextBox x:Name="tbRoomname" Margin="5,0,5,0" Text=""/>
             <Button x:Name="btnJoin" Content="_Join" Width="100" Margin="0,5,0,0" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoomname, Path=Text}"/>
-            <Button x:Name="btnLeave" Content="_Leave" Width="100" Margin="0,5,0,5" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoomname, Path=Text}"/>
+            <Button x:Name="btnLeave" Content="_Leave" Width="100" Margin="0,5,0,5" Command="{Binding Leave}" CommandParameter="{Binding ElementName=tbRoomname, Path=Text}"/>
         </StackPanel>
         <ItemsControl x:Name="RoomsButtons" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" ItemsSource="{Binding Rooms}">
             <ItemsControl.ItemsPanel>

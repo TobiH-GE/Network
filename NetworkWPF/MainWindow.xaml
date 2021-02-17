@@ -4,36 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Network"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="NetworkConnection by TobiH" Height="450" Width="800">
     <Window.Resources>
         <local:BoolToVisibility x:Key="BoolToVisibility"/>
-        <Style x:Key="DeselectedButton" TargetType="Button">
-            <Setter Property="Margin" Value="0,0,2,0" />
-            <Setter Property="Padding" Value="3" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#ccc" Offset="0"/>
-                        <GradientStop Color="#fff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="SelectedButton" TargetType="Button">
-            <Setter Property="Margin" Value="0,0,2,1" />
-            <Setter Property="Padding" Value="2" />
-            <Setter Property="BorderThickness" Value="1,1,1,0" />
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#ccc" Offset="0"/>
-                        <GradientStop Color="#fff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <local:BoolToStyle x:Key="BoolToStyle"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -59,7 +35,8 @@
             <Button x:Name="btnDisconnect" Content="_Disconnect" Width="100" Margin="0,5,0,5" Command="{Binding Disconnect}"/>
             <Label Content="create or join room"/>
             <TextBox x:Name="tbRoomname" Margin="5,0,5,0" Text=""/>
-            <Button x:Name="btnJoin" Content="_Join" Width="100" Margin="0,5,0,5" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoomname, Path=Text}"/>
+            <Button x:Name="btnJoin" Content="_Join" Width="100" Margin="0,5,0,0" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoomname, Path=Text}"/>
+            <Button x:Name="btnLeave" Content="_Leave" Width="100" Margin="0,5,0,5" Command="{Binding Join}" CommandParameter="{Binding ElementName=tbRoomname, Path=Text}"/>
         </StackPanel>
         <ItemsControl x:Name="RoomsButtons" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" ItemsSource="{Binding Rooms}">
             <ItemsControl.ItemsPanel>
@@ -69,14 +46,19 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Style="{StaticResource DeselectedButton}" Content="{Binding Name}" Click="RoomButton_Click"/>
+                    <Button Style="{Binding Selected, Converter={StaticResource BoolToStyle}, ConverterParameter=RoomButton}" Content="{Binding Name}" Click="RoomButton_Click"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
         <ItemsControl x:Name="RoomsContent" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Rooms}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding Content}" Drop="File_Drop" AllowDrop="true" Visibility="{Binding Selected, Converter={StaticResource BoolToVisibility}}"/>
+                    <TextBox Text="{Binding Content}" Drop="File_Drop" AllowDrop="true" Visibility="{Binding Selected, Converter={StaticResource BoolToVisibility}}"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

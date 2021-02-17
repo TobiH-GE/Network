@@ -1,6 +1,9 @@
 ﻿using NetworkViewModel;
+using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Network
 {
@@ -27,6 +30,22 @@ namespace Network
         private void RoomButton_Click(object sender, RoutedEventArgs e)
         {
             ((ViewModel)DataContext).SelectedRoom = ((Button)sender).Content.ToString();
+        }
+    }
+    public class BoolToVisibility : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool == false) throw new ArgumentException();
+            if ((bool)value == true)
+                return Visibility.Visible;
+            else
+                return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
         }
     }
 }

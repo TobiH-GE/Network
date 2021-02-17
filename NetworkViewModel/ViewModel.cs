@@ -7,7 +7,7 @@ using NetworkModel;
 
 namespace NetworkViewModel
 {
-    public class ViewModel : INotifyPropertyChanged
+    public partial class ViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -55,65 +55,7 @@ namespace NetworkViewModel
 
             Username = rnd.Next(10000, 99999).ToString(); // random name
 
-            Rooms.Add(new Room() { Name = "Status", Users = 0, Height = 400 });
-        }
-        public class Room : INotifyPropertyChanged
-        {
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            string _name = "";
-            int _users = 0;
-            string _content;
-            int _height = 0;
-
-            public string Name
-            {
-                get { return _name; }
-                set
-                {
-                    if (_name != value)
-                    {
-                        _name = value;
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
-                    }
-                }
-            }
-            public int Users
-            {
-                get { return _users; }
-                set
-                {
-                    if (_users != value)
-                    {
-                        _users = value;
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Users)));
-                    }
-                }
-            }
-            public string Content
-            {
-                get { return _content; }
-                set
-                {
-                    if (_content != value)
-                    {
-                        _content = value;
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Content)));
-                    }
-                }
-            }
-            public int Height
-            {
-                get { return _height; }
-                set
-                {
-                    if (_height != value)
-                    {
-                        _height = value;
-                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Height)));
-                    }
-                }
-            }
+            Rooms.Add(new Room() { Name = "Status", Users = 0, Selected = true });
         }
         public string Username
         {
@@ -139,11 +81,11 @@ namespace NetworkViewModel
                     {
                         if (item.Name == value)
                         {
-                            item.Height = 400;
+                            item.Selected = true;
                         }
                         else
                         {
-                            item.Height = 0;
+                            item.Selected = false;
                         }
                     }
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedRoom)));
@@ -218,15 +160,12 @@ namespace NetworkViewModel
                 {
                     item.Content += message + "\n";
                 }
-                else
-                {
-                    item.Height = 0;
-                }
             }
         }
         void JoinRoom(string room)
         {
             Rooms.Add(new Room() { Name = room, Users = 2 });
+            SelectedRoom = room;
         }
         void LeaveRoom(string room)
         {

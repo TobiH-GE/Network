@@ -72,7 +72,7 @@ namespace Server
                         {
                             client.Rooms.AddLast(incomingMessage.Parameter);
                             Send(client, new MessageCommand(MsgType.Command, SubType.JoinOk, incomingMessage.Parameter, "", ""));
-                            Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", $"you joined room {incomingMessage.Parameter}."));
+                            Send(client, new MessageText(MsgType.Text, SubType.Room, incomingMessage.Parameter, "server", $"you joined room {incomingMessage.Parameter}."));
                         }
                         else if (SubType == SubType.LeaveRoom)
                         {

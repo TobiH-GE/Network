@@ -46,7 +46,7 @@ namespace Server
                 try
                 {
                     client.data = new byte[1024];
-                    client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length)); // TODO: use client.data.AsMemory???
+                    client.receivedBytes = await client.connection.GetStream().ReadAsync(client.data.AsMemory(0, client.data.Length)).ConfigureAwait(true); // TODO: use client.data.AsMemory???
                     MsgType MessageType = (MsgType)client.data[0];
                     SubType SubType = (SubType)client.data[1];
 
@@ -68,17 +68,31 @@ namespace Server
                                 Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", "password wrong!"));
                             }
                         }
-                        else if(SubType == SubType.JoinRoom)
+                        else if (SubType == SubType.JoinRoom)
                         {
                             client.Rooms.AddLast(incomingMessage.Parameter);
                             Send(client, new MessageCommand(MsgType.Command, SubType.JoinOk, incomingMessage.Parameter, "", ""));
-                            Send(client, new MessageText(MsgType.Text, SubType.Room, incomingMessage.Parameter, "server", $"you joined room {incomingMessage.Parameter}."));
+                            Send(client, new MessageText(MsgType.Text, SubType.Room, incomingMessage.Parameter, "server", $"you joined room {incomingMessage.Parameter} ..."));
                         }
                         else if (SubType == SubType.LeaveRoom)
                         {
                             client.Rooms.Remove(incomingMessage.Parameter);
                             Send(client, new MessageCommand(MsgType.Command, SubType.LeaveOk, incomingMessage.Parameter, "", ""));
                             Send(client, new MessageText(MsgType.Text, SubType.Info, "", "server", $"you left room {incomingMessage.Parameter}."));
+                        }
+                        else if (SubType == SubType.Userlist)
+                        {
+                            string userlist = "";
+                            foreach (var connectedclient in connectedClients)
+                            {
+                                if (connectedclient.connection == null || !connectedclient.connection.Connected) return; //TODO: dont return
+                                if (connectedclient.Rooms.Contains(incomingMessage.Parameter))
+                                {
+                                    userlist += (char)connectedclient.Username.Length + connectedclient.Username;
+                                }
+                            }
+                            consoleResponse.Invoke($"user {incomingMessage.Username} is requesting a userlist, room: {incomingMessage.Parameter} ...");
+                            Send(client, new MessageCommand(MsgType.Command, SubType.Userlist, incomingMessage.Parameter, "server", userlist)); //TODO: remove bug
                         }
                     }
                     else if (MessageType == MsgType.Data)
@@ -98,7 +112,7 @@ namespace Server
                         else if (SubType == SubType.Room)
                         {
                             consoleResponse.Invoke("incoming group text message ...");
-                            SendGroup(incomingMessage); //TODO: send only to room
+                            SendRoom(incomingMessage); //TODO: send only to room
                         }
                         else if (SubType == SubType.Broadcast)
                         {
@@ -143,7 +157,7 @@ namespace Server
             }
             consoleResponse.Invoke("sending message to all ... ");
         }
-        public void SendGroup(Message message)
+        public void SendRoom(Message message)
         {
             foreach (var client in connectedClients)
             {

@@ -20,7 +20,8 @@ namespace NetworkMessage
         JoinRoom,
         JoinOk,
         LeaveRoom,
-        LeaveOk
+        LeaveOk,
+        Userlist
     }
     public abstract class Message
     {

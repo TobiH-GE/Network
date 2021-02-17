@@ -27,12 +27,13 @@ namespace NetworkModel
         }
         public static async void ReceiveData_Async()
         {
-            byte[] data = new byte[1024];
+            byte[] data;
             int receivedBytes = 0;
             while (connection.Connected)
             {
                 try
                 {
+                    data = new byte[1024];
                     receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length), cts.Token);
                     MsgType MessageType = (MsgType)data[0];
                     SubType SubType = (SubType)data[1];
@@ -55,6 +56,10 @@ namespace NetworkModel
                         {
                             OnReceive.Invoke("Status", $"leaving room {incomingMessage.Parameter}.");
                             OnLeaveOk.Invoke(incomingMessage.Parameter);
+                        }
+                        else if (SubType == SubType.Userlist)
+                        {
+                            OnReceive.Invoke("Status", $"received userlist room: {incomingMessage.Parameter}.");
                         }
                     }
                     else if (MessageType == MsgType.Data)

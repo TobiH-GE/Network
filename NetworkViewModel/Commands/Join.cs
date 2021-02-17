@@ -22,6 +22,8 @@ namespace NetworkViewModel
         {
             Message outgoingMessage = new MessageCommand(MsgType.Command, SubType.JoinRoom, ((string)parameter), Parent.Username, "");
             TCPConnection.Send(outgoingMessage);
+            outgoingMessage = new MessageCommand(MsgType.Command, SubType.Userlist, ((string)parameter), Parent.Username, "");
+            TCPConnection.Send(outgoingMessage);
         }
     }
 }

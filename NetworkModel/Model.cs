@@ -27,59 +27,66 @@ namespace NetworkModel
         }
         public static async void ReceiveData_Async()
         {
-            byte[] data;
+            byte[] receivedData;
             int receivedBytes = 0;
             while (connection.Connected)
             {
                 try
                 {
-                    data = new byte[1024];
-                    receivedBytes = await connection.GetStream().ReadAsync(data.AsMemory(0, data.Length), cts.Token);
-                    MsgType MessageType = (MsgType)data[0];
-                    SubType SubType = (SubType)data[1];
+                    receivedData = new byte[1024];
+                    receivedBytes = await connection.GetStream().ReadAsync(receivedData.AsMemory(0, receivedData.Length), cts.Token);
+                    int MessageSize = BitConverter.ToInt32(receivedData, 4); // TODO: remove bug
 
-                    if (MessageType == MsgType.Command)
+                    do
                     {
-                        MessageCommand incomingMessage = new MessageCommand(data);
-                        if (SubType == SubType.LoginRequest)
+                        byte[] data = receivedData[..MessageSize];
+                        MsgType MessageType = (MsgType)data[0];
+                        SubType SubType = (SubType)data[1];
+
+                        if (MessageType == MsgType.Command)
                         {
-                            OnReceive.Invoke("Status", "server is requesting login data ...");
-                            Send(new MessageCommand(MsgType.Command, SubType.Login, "password", Username));
+                            MessageCommand incomingMessage = new MessageCommand(data);
+                            if (SubType == SubType.LoginRequest)
+                            {
+                                OnReceive.Invoke("Status", "server is requesting login data ...");
+                                Send(new MessageCommand(MsgType.Command, SubType.Login, "password", Username));
+                                // do something
+                            }
+                            else if (SubType == SubType.JoinOk)
+                            {
+                                OnReceive.Invoke("Status", $"joining room {incomingMessage.Parameter}.");
+                                OnJoinOk.Invoke(incomingMessage.Parameter);
+                            }
+                            else if (SubType == SubType.LeaveOk)
+                            {
+                                OnReceive.Invoke("Status", $"leaving room {incomingMessage.Parameter}.");
+                                OnLeaveOk.Invoke(incomingMessage.Parameter);
+                            }
+                            else if (SubType == SubType.Userlist)
+                            {
+                                OnReceive.Invoke("Status", $"received userlist room: {incomingMessage.Parameter}.");
+                            }
+                        }
+                        else if (MessageType == MsgType.Data)
+                        {
+                            MessageData incomingMessage = new MessageData(data);
                             // do something
                         }
-                        else if(SubType == SubType.JoinOk)
+                        else if (MessageType == MsgType.Text)
                         {
-                            OnReceive.Invoke("Status", $"joining room {incomingMessage.Parameter}.");
-                            OnJoinOk.Invoke(incomingMessage.Parameter);
-                        }
-                        else if (SubType == SubType.LeaveOk)
-                        {
-                            OnReceive.Invoke("Status", $"leaving room {incomingMessage.Parameter}.");
-                            OnLeaveOk.Invoke(incomingMessage.Parameter);
-                        }
-                        else if (SubType == SubType.Userlist)
-                        {
-                            OnReceive.Invoke("Status", $"received userlist room: {incomingMessage.Parameter}.");
-                        }
-                    }
-                    else if (MessageType == MsgType.Data)
-                    {
-                        MessageData incomingMessage = new MessageData(data);
-                        // do something
-                    }
-                    else if (MessageType == MsgType.Text)
-                    {
-                        MessageText incomingMessage = new MessageText(data);
+                            MessageText incomingMessage = new MessageText(data);
 
-                        if (SubType == SubType.Room)
-                        {
-                            OnReceive.Invoke(incomingMessage.Parameter, incomingMessage.Username + ": " + incomingMessage.Text);
+                            if (SubType == SubType.Room)
+                            {
+                                OnReceive.Invoke(incomingMessage.Parameter, incomingMessage.Username + ": " + incomingMessage.Text);
+                            }
+                            else
+                            {
+                                OnReceive.Invoke("Status", incomingMessage.Username + ": " + incomingMessage.Text);
+                            }
                         }
-                        else
-                        {
-                            OnReceive.Invoke("Status", incomingMessage.Username + ": " + incomingMessage.Text);
-                        }
-                    }
+                        receivedData = receivedData[MessageSize..];
+                    } while (receivedData[MessageSize..].Length > 0);
                 }
                 catch (Exception)
                 {

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace NetworkMessage
 {
@@ -29,6 +30,7 @@ namespace NetworkMessage
         public SubType Stype;
         public string Parameter;
         public string Username;
+        public int MessageSize;
         public Message(MsgType MessageType, SubType Stype, string Parameter, string Username)
         {
             this.Mtype = MessageType;
@@ -53,8 +55,9 @@ namespace NetworkMessage
             Stype = (SubType)Data[1];
             byte ParamterLenght = Data[2];
             byte UsernameLenght = Data[3];
+            MessageSize = BitConverter.ToInt32(Data, 4) + 8;
 
-            int offset = 4;
+            int offset = 8;
             string message = Encoding.ASCII.GetString(Data, offset, Data.Length - offset);
             Parameter = message.Substring(0, ParamterLenght);
             Username = message.Substring(ParamterLenght, UsernameLenght);
@@ -62,12 +65,17 @@ namespace NetworkMessage
         }
         public override byte[] getBytes() //TODO: create more message types
         {
-            string datastring = $"    {Parameter}{Username}{Command}";
+            string datastring = $"        {Parameter}{Username}{Command}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
             data[0] = (byte)Mtype;
             data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
+            byte[] databytes = BitConverter.GetBytes(Command.Length * 2); // TODO: better converter
+            data[4] = databytes[0];
+            data[5] = databytes[1];
+            data[6] = databytes[2];
+            data[7] = databytes[3];
             return data;
         }
     }
@@ -84,8 +92,9 @@ namespace NetworkMessage
             Stype = (SubType)Data[1];
             byte ParamterLenght = Data[2];
             byte UsernameLenght = Data[3];
+            MessageSize = BitConverter.ToInt32(Data, 4) + 8;
 
-            int offset = 4;
+            int offset = 8;
             string message = Encoding.ASCII.GetString(Data, offset, ParamterLenght + UsernameLenght);
             Parameter = message.Substring(0, ParamterLenght);
             Username = message.Substring(ParamterLenght, UsernameLenght);
@@ -94,12 +103,17 @@ namespace NetworkMessage
         }
         public override byte[] getBytes() //TODO: correct {Data}
         {
-            string datastring = $"    {Parameter}{Username}{Data}";
+            string datastring = $"        {Parameter}{Username}{Data}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
             data[0] = (byte)Mtype;
             data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
+            byte[] databytes = BitConverter.GetBytes(Data.Length); // TODO: better converter
+            data[4] = databytes[0];
+            data[5] = databytes[1];
+            data[6] = databytes[2];
+            data[7] = databytes[3];
             return data;
         }
     }
@@ -116,8 +130,9 @@ namespace NetworkMessage
             Stype = (SubType)Data[1];
             byte ParamterLenght = Data[2];
             byte UsernameLenght = Data[3];
+            MessageSize = BitConverter.ToInt32(Data, 4) + 8;
 
-            int offset = 4;
+            int offset = 8;
             string message = Encoding.ASCII.GetString(Data, offset, Data.Length - offset);
             Parameter = message.Substring(0, ParamterLenght);
             Username = message.Substring(ParamterLenght, UsernameLenght);
@@ -125,12 +140,17 @@ namespace NetworkMessage
         }
         public override byte[] getBytes() //TODO: create more message types
         {
-            string datastring = $"    {Parameter}{Username}{Text}";
+            string datastring = $"        {Parameter}{Username}{Text}";
             byte[] data = Encoding.ASCII.GetBytes(datastring);
             data[0] = (byte)Mtype;
             data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
+            byte[] databytes = BitConverter.GetBytes(Text.Length * 2); // TODO: better converter
+            data[4] = databytes[0];
+            data[5] = databytes[1];
+            data[6] = databytes[2];
+            data[7] = databytes[3];
             return data;
         }
     }

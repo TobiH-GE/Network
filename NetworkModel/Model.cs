@@ -31,15 +31,15 @@ namespace NetworkModel
             int receivedBytes = 0;
             while (connection.Connected)
             {
-                try
-                {
+                
                     receivedData = new byte[1024];
                     receivedBytes = await connection.GetStream().ReadAsync(receivedData.AsMemory(0, receivedData.Length), cts.Token);
-                    int MessageSize = BitConverter.ToInt32(receivedData, 4); // TODO: remove bug
+                    int MessageSize = BitConverter.ToInt32(receivedData, 4) + 8; 
 
-                    do
+                    do // TODO: remove bug
                     {
                         byte[] data = receivedData[..MessageSize];
+                        receivedData = receivedData[MessageSize..];
                         MsgType MessageType = (MsgType)data[0];
                         SubType SubType = (SubType)data[1];
 
@@ -86,13 +86,8 @@ namespace NetworkModel
                             }
                         }
                         receivedData = receivedData[MessageSize..];
-                    } while (receivedData[MessageSize..].Length > 0);
-                }
-                catch (Exception)
-                {
-                    OnReceive.Invoke("Status", "(connection error or connection aborted)");
-                    Disconnect();
-                }
+                    } while (receivedData.Length > 7);
+                
                 if (receivedBytes < 1) // TODO: optimize, remove bug
                 {
                     Console.WriteLine("connection error, closing connection: ...");

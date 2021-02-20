@@ -71,7 +71,7 @@ namespace NetworkMessage
             data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
-            byte[] databytes = BitConverter.GetBytes(Command.Length * 2); // TODO: better converter
+            byte[] databytes = BitConverter.GetBytes(datastring.Length); // TODO: better converter
             data[4] = databytes[0];
             data[5] = databytes[1];
             data[6] = databytes[2];
@@ -109,7 +109,7 @@ namespace NetworkMessage
             data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
-            byte[] databytes = BitConverter.GetBytes(Data.Length); // TODO: better converter
+            byte[] databytes = BitConverter.GetBytes(datastring.Length); // TODO: better converter
             data[4] = databytes[0];
             data[5] = databytes[1];
             data[6] = databytes[2];
@@ -146,7 +146,7 @@ namespace NetworkMessage
             data[1] = (byte)Stype;
             data[2] = (byte)Parameter.Length;
             data[3] = (byte)Username.Length;
-            byte[] databytes = BitConverter.GetBytes(Text.Length * 2); // TODO: better converter
+            byte[] databytes = BitConverter.GetBytes(datastring.Length); // TODO: better converter
             data[4] = databytes[0];
             data[5] = databytes[1];
             data[6] = databytes[2];

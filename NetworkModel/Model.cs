@@ -28,18 +28,21 @@ namespace NetworkModel
         public static async void ReceiveData_Async()
         {
             byte[] receivedData;
+            byte[] receivedDataDebug; // debug
             int receivedBytes = 0;
             while (connection.Connected)
             {
-                
                     receivedData = new byte[1024];
-                    receivedBytes = await connection.GetStream().ReadAsync(receivedData.AsMemory(0, receivedData.Length), cts.Token);
-                    int MessageSize = BitConverter.ToInt32(receivedData, 4) + 8; 
+                receivedDataDebug = new byte[1024]; // debug
 
+                receivedBytes = await connection.GetStream().ReadAsync(receivedData.AsMemory(0, receivedData.Length), cts.Token);
+                receivedDataDebug = receivedData;
+                    int MessageSize = BitConverter.ToInt32(receivedData, 4);
+
+                    OnReceive.Invoke("Status", $"received data with receivedBytes {receivedBytes} MessageSize {MessageSize} ...");
                     do // TODO: remove bug
                     {
                         byte[] data = receivedData[..MessageSize];
-                        receivedData = receivedData[MessageSize..];
                         MsgType MessageType = (MsgType)data[0];
                         SubType SubType = (SubType)data[1];
 
@@ -85,8 +88,14 @@ namespace NetworkModel
                                 OnReceive.Invoke("Status", incomingMessage.Username + ": " + incomingMessage.Text);
                             }
                         }
+                    if (receivedBytes > MessageSize + 8)
+                    {
                         receivedData = receivedData[MessageSize..];
-                    } while (receivedData.Length > 7);
+                        MessageSize = BitConverter.ToInt32(receivedData, 4);
+                    }
+                    else
+                        MessageSize = 0;
+                    } while (MessageSize > 0);
                 
                 if (receivedBytes < 1) // TODO: optimize, remove bug
                 {
